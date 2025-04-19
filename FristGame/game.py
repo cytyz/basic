@@ -9,6 +9,9 @@ if guess == 8:
 	print("你是小甲鱼心里的蛔虫吗？！")
 	print("哼，猜中了也没奖励！")
 else:
-	print("猜错了，小甲鱼心里想的是8！")
+	if guess < 8:
+		print("小了")
+	else:
+		print("大了")
 
 print("游戏结束，不玩了。")
