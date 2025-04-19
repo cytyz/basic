@@ -80,3 +80,21 @@ print(pow(2, 3, 5))
 # 3
 print(2 ** 3 % 5)
 # 3
+
+#布尔值
+print(1 == True)
+#True
+print(0 == False)
+#True
+print(5 > 3 and 4)
+#4
+
+# 有理数分数形式（约分后）
+from fractions import Fraction
+print(Fraction(16, -10))
+#Fraction(8, -5)
+print(Fraction(123))
+#Fraction(123, 1)
+print(Fraction("-3/7"))
+#Frafction(-3, 7)
+
