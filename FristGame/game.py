@@ -2,6 +2,7 @@
 #input()用于接受用户的输入并返回，如：
 #name = input('你叫什么名字？\n')
 #print(name)
+
 temp = input("不妨猜一下小甲鱼在心里想的是那个数字。")
 guess = int(temp)
 
