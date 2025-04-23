@@ -14,6 +14,7 @@ print(a + b)
 # 0.3
 print(a + b == c)
 # True
+print("--------------------------------")
 
 # 科学计数法
 print(0.00005)
@@ -81,14 +82,6 @@ print(pow(2, 3, 5))
 print(2 ** 3 % 5)
 # 3
 
-#布尔值
-print(1 == True)
-#True
-print(0 == False)
-#True
-print(5 > 3 and 4)
-#4
-
 # 有理数分数形式（约分后）
 from fractions import Fraction
 print(Fraction(16, -10))
@@ -98,3 +91,27 @@ print(Fraction(123))
 print(Fraction("-3/7"))
 #Frafction(-3, 7)
 
+print("--------------------------------")
+#布尔值
+print(1 == True)
+#True
+print(0 == False)
+#True
+print(5 > 3 and 4)
+#4
+
+# 优先级顺序为 NOT、AND、OR
+# 短路逻辑核心思路
+# 从左到右，只有当第一个操作数的值无法确定逻辑运算的结果时，才对第二个操作数进行求值
+print((not 1) or (0 and 1) or (3 and 4) or (5 and 6) or (7 and 8 and 9))
+# 4
+print(3 and 4)
+# 4
+print(3 or 4)
+# 3
+print(not 1 or 0 and 1 or 3 and 4 or 5 and 6 or 7 and 8 and 9)
+# 4
+print(3 and 5 + True or False)
+# 6
+print(0 and not 1 or not 2 and 3 or 4 and not 5)
+# False
