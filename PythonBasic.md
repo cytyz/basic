@@ -426,8 +426,8 @@ n = int(input("请输入一个正整数："))
 while n > 0:
     # 判断 n 是否可以被 2 整除 #
     if n % 2 == 0:
-        print(n, " / 2 = ", int(n / 2))
-        n = int(n / 2)
+        print(n, " / 2 = ", n // 2)
+        n = n // 2
     else:
         print(n, " * 3 + 1 == ", n * 3 + 1)
         n = n * 3 + 1
@@ -439,7 +439,6 @@ while n > 0:
 # 8  / 2 =  4
 # 4  / 2 =  2
 # 2  / 2 =  1
-
 
 ```
 
@@ -585,6 +584,47 @@ while i <= 9:
 # 1 * 7 = 7 2 * 7 = 14 3 * 7 = 21 4 * 7 = 28 5 * 7 = 35 6 * 7 = 42 7 * 7 = 49 
 # 1 * 8 = 8 2 * 8 = 16 3 * 8 = 24 4 * 8 = 32 5 * 8 = 40 6 * 8 = 48 7 * 8 = 56 8 * 8 = 64 
 # 1 * 9 = 9 2 * 9 = 18 3 * 9 = 27 4 * 9 = 36 5 * 9 = 45 6 * 9 = 54 7 * 9 = 63 8 * 9 = 72 9 * 9 = 81 
+
+```
+
+
+
+## for_in
+
+```python
+for each in "FishC":
+    print(each)
+# F
+# i
+# s
+# h
+# C
+print("————————————————————————")
+# 用while实现
+i = 0
+while i < len("FishC"):
+    print("FishC"[i])
+    i += 1
+# F
+# i
+# s
+# h
+# C
+print("————————————————————————")
+# range(10) 从0到10（不包括10）的整数序列
+# range(0, 10)
+# range(0, 10, 2)
+for each in range(10):
+    print(each)
+
+# 求1~10之间的素数
+for n in range(2, 10):
+    for x in range(2, n):
+        if n % x == 0:
+            print(n, "=", n // x, "*", x)
+            break
+    else:
+        print(n, "是一个素数")
 
 ```
 
