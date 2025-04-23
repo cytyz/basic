@@ -51,3 +51,4 @@ git add -A —> git commit -m “修改文件名” —> git push origin main
 $ git commit --amend的作用：
 
 github不管你做错了啥，他都会给你保存的，就是即使你改了，你的错误记录永远存在！但是使用git commit --amend，你可以神不知鬼不觉悄咪咪修改你的错误commit注释，╭(●｀∀´●)╯只有天知地知你知。
+
