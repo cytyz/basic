@@ -16,6 +16,7 @@ print('"I love Python, \nI Love FishC"')
 #I love Python,
 #I Love FishC
 
+print("————————————————————————————————————————————")
 #当需要传入路径时，路径中每个层级前都需要添加一个转义字符\，或者在其前添加r表示后面的为原始字符
 print("D:\\three\\two\\one\\now")
 #D:\three\two\one\now
