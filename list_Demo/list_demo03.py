@@ -12,6 +12,12 @@ matrix = [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
 matrix = [[1, 2, 3],
           [4, 5, 6],
           [7, 8, 9]]
+# 遍历数组
+for i in matrix:
+    print(i)
+# [1, 2, 3]
+# [4, 5, 6]
+# [7, 8, 9]
 for i in matrix:
     for j in i:
         print(j, end=" ")
@@ -58,3 +64,13 @@ for i in range(3):
     for j in range(3):
         C[i][j] = [0] * 3
 print(C)
+
+# 从空数组开始创建
+d = []
+for i in range(3):
+    d.append([])
+    for j in range(3):
+        d[i].append([])
+        for k in range(3):
+            d[i][j].append(0)
+print(d)
