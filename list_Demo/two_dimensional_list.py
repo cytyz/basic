@@ -49,3 +49,4 @@ for i in range(m):
     for j in range(n):
         if matrix[i][j] == min_row[i] and matrix[i][j] == max_col[j]:
             print(matrix[i][j])
+# 66
