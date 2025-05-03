@@ -913,6 +913,8 @@ print(s)
 
 ## ==合法字符串==
 
+
+
 ```python
 # 合法字符串
 # 判断给定的字符串 s 中括号的写法是否合法
@@ -1048,6 +1050,18 @@ print(d)
 
 
 ## ==深浅拷贝、赋值“=”  与 嵌套列表 与  地址==
+
+==深浅拷贝、赋值“=”  与 嵌套列表 与  地址==
+
+==对于不可变对象（数值，字符串，元组），各对象均指向同一地址；因对象不可变，原对象改变时指向新地址，其余复制对象仍指向原地址，不会随之改变==
+
+==对于可变对象（列表，字典）：赋值“=”与原对象指向同一地址，浅拷贝和深拷贝分别创建新的对象，指向了新的地址==
+
+==但浅拷贝、赋值“=”与原对象的子对象均指向同一地址，而深拷贝的子对象则创建了新的对象，指向了新的地址==
+
+==故改变 复杂子对象 的值时，浅拷贝、赋值“=”会随之改变==
+
+==浅拷贝不适用于嵌套列表，对于浅拷贝只能拷贝嵌套列表的外层，而对于内层只是对内层进行引用，当原嵌套列表子对象改变时，浅拷贝对象亦会随之改变==
 
 ```python
 # 深浅拷贝、赋值“=”  与 嵌套列表 与  地址
@@ -1342,6 +1356,12 @@ print(d)
 
 ## ==杨辉三角形==
 
+==去掉[]和， :列表转字符串，并以空格连接起来==
+    ==tri1 = " ".join(str(j) for j in i)==
+
+==将字符串和  6 - 1 - len(str(j))  个空格以空格连接起来，其中 -1 的空格是以空格连接的空格==
+    ==tri2 = " ".join(str(j) + " " * (6 - 1 - len(str(j))) for j in i)==
+
 ```python
 # 杨辉三角形
 tri = []
@@ -1575,4 +1595,231 @@ print(tuple_time1)
 ```
 
 
+
+# 9.字符串
+
+## 大小写转换与对齐
+
+```python
+# 大小写转换与对齐
+# 字符串不可变，改变字符串时实际上是生成一个新的字符串
+
+# capitalize 将整个字符串首字母大写其余变小写
+# casefold 将整个字符串变小写（与lower不一样的是它可以处理英文之外的字母）
+# title 将字符串中每个单词的首字母大写
+# swapcase 将整个字符串所有字母大小写翻转
+# upper 将整个字符串变大写
+# lower 将整个字符串变小写
+x = "I Love FishC"
+print(x.capitalize())
+# I love fishc
+print(x.casefold())
+# i love fishc
+print(x.title())
+# I Love Fishc
+print(x.swapcase())
+# i lOVE fISHc
+print(x.upper())
+# I LOVE FISHC
+print(x.lower())
+# i love fishc
+
+# 左中右对齐
+# center(width, fillchar='") 居中对齐，默认空格填充
+# ljust(width, fillchar='") 左对齐，默认空格填充
+# rjust(width, fillchar='") 右对齐，默认空格填充
+# zfill(width) 用0填充左侧
+x = "有内鬼，停止交易"
+print(x.center(15))
+#    有内鬼，停止交易
+print(x.ljust(15))
+# 有内鬼，停止交易
+print(x.rjust(15))
+#        有内鬼，停止交易
+print(x.zfill(15))
+# 0000000有内鬼，停止交易
+
+print("-520".zfill(10))
+# -000000520
+print("-520".rjust(10, "0"))
+# 000000-520
+print("I love FishC".swapcase()[::-1])
+# cHSIf EVOL i
+
+# 判断回文数
+num = ["123", "33211", "12321", "13531", "112233"]
+pr = [i for i in num if i == i[::-1]]
+print(pr)
+# ['12321', '13531']
+
+```
+
+
+
+## 整理字符串与ASCII转换
+
+==ord 将字母转换成ASCII， chr 将ASCII转换成字母==
+
+```python
+# 整理字符串与ASCII转换
+# 一个整理好的字符串中，两个相邻字符 s[j] 和 s[j+1]，其中 0 <= j <= s.length - 2，要满足如下条件：
+# 若 s[j] 是小写字符，则 s[j+1] 不可以是相同的大写字符
+# 若 s[j] 是大写字符，则 s[j+1] 不可以是相同的小写字符
+# 如果 s[j] 和 s[j+1] 满足以上两个条件，则将它们一并删除
+s = input("请输入待整理的字符串:")
+# 请输入待整理的字符串:AAAaBbcC
+# 字符串不可变，转换成列表来处理1
+s2 = list(s)
+j = 0
+while j < len(s2) - 1:
+    if s2[j].lower() == s2[j + 1].lower() and s2[j] != s2[j + 1]:
+        # 先去掉了j，j+1变成了j
+        s2.pop(j)
+        s2.pop(j)
+        j = j - 1
+        print(s2)
+        # ['A', 'A', 'B', 'b', 'c', 'C']
+        # ['A', 'A', 'c', 'C']
+    else:
+        j = j + 1
+
+s3 = ''.join(s2)
+print(s3)
+# ['A', 'A']
+
+# 给定的字符串 s 是按照如下规则存放的：它的偶数下标为小写英文字母，奇数下标为正整数。
+# 题目要求：编写代码，将奇数下标的数字转换为相对于上一个字母偏移后的字母。
+s = "a1b2c3"
+# # ord 将字母转换成ASCII， chr 将ASCII转换成字母
+# print(ord("a"))
+# # 97
+# print(chr(97))
+# # a
+# print(ord("z"))
+# # 122
+s1 = list(s)
+for i in range(len(s1)-1):
+    if s1[i].isalpha() and s1[i + 1].isdigit():
+        s1[i + 1] = chr(ord(s1[i])+int(s1[i+1]))
+s = ''.join(s1)
+print(s)
+
+```
+
+
+
+## 查找与替换
+
+```python
+# 查找与替换
+# 查找
+# count(sub[,start[,end]]) 查找指定的子字符串出现的次数
+# find(sub[,start[,end]]) 从左往右找指定的子字符串， 找不到返回-1
+# rfind(sub[,start[,end]]) 从右往左找指定的字符串， 找不到返回-1
+# index(sub[,start[,end]]) 从左往右找指定的子字符串， 找不到抛出异常
+# rindex(sub[,start[,end]]) 从右往左找指定的字符串， 找不到抛出异常
+x = "上海自来水来自海上"
+print(x.count("海"))
+# 2
+print(x.count("海", 2, 8))
+# 1
+print(x.find("海"))
+# 1
+print(x.rfind("海"))
+# 7
+print(x.find("龟"))
+# -1
+# print(x.index("龟"))
+# Traceback (most recent call last):
+#   File "D:\Program Repository\github\basic\strings\strings_demo02.py", line 18, in <module>
+#     print(x.index("龟"))
+# ValueError: substring not found
+
+# 替换
+# expandtabs([tabsize]) 使用来替换tab制表符，并返回一个新的字符串
+# replace(old, new, count=-1) 将旧字符串替换为新字符串，count 替换的次数，默认-1
+# 尽量用空格代替tab
+code = """
+    print("I Love FishC")
+    print("I Love My Wife")"""
+new_code = code.expandtabs(4)
+print(new_code)
+#
+#     print("I Love FishC")
+#     print("I Love My Wife")
+w = "在吗！我在你家楼下，快点下来！！！"
+print(w.replace("在吗", "想你"))
+# 想你！我在你家楼下，快点下来！！！
+
+# str.maketrans[x[,y[,z]]] 制定转换规则的表格，x 替换成y 忽略z中包含的字母
+# translate(table) 将字符串以表格中的规则替换
+table = str.maketrans("ABCDEFG", "1234567")
+q = "I Love FishC"
+print(q.translate(table))
+# I Love 6ish3
+print("I Love FishC".translate(str.maketrans("ABCDEFG", "1234567")))
+# I Love 6ish3
+print("veol Love FishC".translate(str.maketrans("ABCDEFG", "1234567", "love")))
+# I  6ish3  z中包含l o v e, 故veol ove都被忽略
+
+x = "上海自来水来自海上"
+print(x.rindex("来水来"))
+# 3
+
+```
+
+
+
+## 版本号比较与加密（规则替换）
+
+```python
+# 版本号比较与加密（规则替换）
+# 用户输入两个版本号 v1 和 v2，请编写代码比较它们，找出较新的版本。
+# 版本号是由一个或多个修订号组成，各个修订号之间由点号（.）连接，每个修订号由多位数字组成，例如 1.2.33 和 0.0.11 都是有效的版本号。
+# 从左到右的顺序依次比较它们的修订号，点号（.）左侧的值要比右侧的权重大，即 0.1 要比 0.0.99 大。
+v1 = input("请输入第一个版本号，v1 = ")
+v2 = input("请输入第二个版本号，v2 = ")
+m, n = len(v1), len(v2)
+i, j = 0, 0
+x, y = 0, 0
+while i < m or j < n:
+    x, y = 0, 0
+    # 舍弃. 直接用数字进行比较
+    while i < m and v1[i] != '.':
+        x = x * 10 + int(v1[i])
+        i += 1
+    i += 1
+    while j < n and v2[j] != '.':
+        y = y * 10 + int(v2[j])
+        j += 1
+    j += 1
+    if x > y:
+        print("v1")
+        break
+    elif x < y:
+        print("v2")
+if x == y:
+    print("v1 == v2")
+# 请输入第一个版本号，v1 = 1.0.0
+# 请输入第二个版本号，v2 = 1
+# v1 == v2
+
+# 加密
+# 编写一个加密程序，其实现原理是通过替换指定的字符进行加密，附加要求是实现密文逆向检测。
+s = input("请输入需要加密的明文：")
+t1 = input("请输入需要替换的字符：")
+t2 = input("请输入将1要替换的字符：")
+i = 0
+if len(t1) == len(t2):
+    table = str.maketrans(t1, t2)
+    print("加密后的密文是：", s.translate(table))
+    while i < len(t1) - 1:
+        if t1[i] == t1[i + 1] or t2[i] == t2[i + 1]:
+            print("由于替换字符出现冲突，该密文无法解密！")
+            break
+        i += 1
+else:
+    print("需要替换的字符数量必须跟将要替换的字符数量一致！")
+
+```
 
