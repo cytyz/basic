@@ -1656,7 +1656,7 @@ print(pr)
 
 
 
-## 整理字符串与ASCII转换
+## ==整理字符串与ASCII转换==
 
 ==ord 将字母转换成ASCII， chr 将ASCII转换成字母==
 
@@ -1666,41 +1666,45 @@ print(pr)
 # 若 s[j] 是小写字符，则 s[j+1] 不可以是相同的大写字符
 # 若 s[j] 是大写字符，则 s[j+1] 不可以是相同的小写字符
 # 如果 s[j] 和 s[j+1] 满足以上两个条件，则将它们一并删除
-s = input("请输入待整理的字符串:")
-# 请输入待整理的字符串:AAAaBbcC
-# 字符串不可变，转换成列表来处理1
-s2 = list(s)
-j = 0
-while j < len(s2) - 1:
-    if s2[j].lower() == s2[j + 1].lower() and s2[j] != s2[j + 1]:
-        # 先去掉了j，j+1变成了j
-        s2.pop(j)
-        s2.pop(j)
-        j = j - 1
-        print(s2)
-        # ['A', 'A', 'B', 'b', 'c', 'C']
-        # ['A', 'A', 'c', 'C']
-    else:
-        j = j + 1
-
-s3 = ''.join(s2)
-print(s3)
+# s = input("请输入待整理的字符串:")
+# # 请输入待整理的字符串:AAAaBbcC
+# # 字符串不可变，转换成列表来处理1
+# s2 = list(s)
+# j = 0
+# while j < len(s2) - 1:
+#     if s2[j].lower() == s2[j + 1].lower() and s2[j] != s2[j + 1]:
+#         # 先去掉了j，j+1变成了j
+#         s2.pop(j)
+#         s2.pop(j)
+#         j = j - 1
+#         print(s2)
+#         # ['A', 'A', 'B', 'b', 'c', 'C']
+#         # ['A', 'A', 'c', 'C']
+#     else:
+#         j = j + 1
+#
+# s3 = ''.join(s2)
+# print(s3)
 # ['A', 'A']
 
 # 给定的字符串 s 是按照如下规则存放的：它的偶数下标为小写英文字母，奇数下标为正整数。
 # 题目要求：编写代码，将奇数下标的数字转换为相对于上一个字母偏移后的字母。
-s = "a1b2c3"
+s = "z1a2c3"
 # # ord 将字母转换成ASCII， chr 将ASCII转换成字母
-# print(ord("A"), ord("Z"),ord("a"))
-# # 97
+# print(ord("A"), ord("Z"), ord("a"), ord("z"))
+# # 65 90 97 122
 # print(chr(97))
 # # a
-# print(ord("z"))
-# # 122
 s1 = list(s)
 for i in range(len(s1)-1):
     if s1[i].isalpha() and s1[i + 1].isdigit():
-        s1[i + 1] = chr(ord(s1[i])+int(s1[i+1]))
+        temp = ord(s1[i])+int(s1[i+1])
+        if 97 <= temp <= 122:
+            s1[i + 1] = chr(temp)
+        elif temp > 122:
+            s1[i + 1] = chr(temp - 122 + 97 -1)
+        else:
+            s1[i + 1] = chr(temp - 122)
 s = ''.join(s1)
 print(s)
 
@@ -1981,6 +1985,156 @@ if length2 >= length:
     print("True")
 else:
     print("False")
+
+```
+
+
+
+## 截取字符串
+
+```python
+# 截取字符串
+# 以所给字符串中单个字符串为单位来剔除
+# strip(chars=None) 以所给字符串中单个字符串为单位来剔除当前字符串左右字符
+# lstrip(chars=None) 以所给字符串中单个字符串为单位来剔除当前字符串左侧字符
+# rstrip(chars=None) 以所给字符串中单个字符串为单位来剔除当前字符串右侧字符
+# 剔除掉指定的子字符串
+# removeprefix(prefix) 剔除掉整个字符串的指定前缀
+# removesuffix(psuffix) 剔除掉整个字符串的指定后缀
+# 截取掉空白
+print("    左侧不要留白".lstrip())
+# 左侧不要留白
+print("右侧不要留白    ".lstrip())
+# 右侧不要留白
+print("    左右都不要留白    ".lstrip())
+# 左右都不要留白
+print("www.ilovefishc.com".lstrip("wcom.lh"))
+# ilovefishc.com
+print("www.ilovefishc.com".rstrip("wcom.lh"))
+# www.ilovefis
+print("www.ilovefishc.com".strip("wcom.lh"))
+# ilovefis
+
+print("www.ilovefishc.com".removeprefix("www."))
+# ilovefishc.com
+print("www.ilovefishc.com".removesuffix(".com"))
+# www.ilovefishc
+print("www.ilovefishc.com".removeprefix("love"))
+# www.ilovefishc.com
+
+
+# 拆分和拼接
+# partition(sep) 根据所给字符串从左到右查找来分割当前字符串，并返回相应的三元组
+# rpartition(sep) 根据所给字符串从右到左查找来分割当前字符串，并返回相应的三元组
+print("www.ilovefishc.com".partition("."))
+print("www.ilovefishc.com".rpartition("."))
+
+# split(sep=None,maxsplit=-1) 默认从左到右以空格来切割，不限次数切割，将结果以列表形式返回
+# rsplit(sep=None,maxsplit=-1) 默认从右到左以空格来切割，不限次数切割，将结果以列表形式返回
+# 换行符：\n,\r
+# splitlines(keepends=False) 按行切割，将结果以列表形式返回 keepspends 指定结果是否包含换行符
+print("www.ilovefishc.com".split(".", 1))
+# ['www', 'ilovefishc.com']
+print("www.ilovefishc.com".rsplit(".", 1))
+# ['www.ilovefishc', 'com']
+print("www\nilovefishc\rcom".splitlines())
+# ['www', 'ilovefishc', 'com']
+print("www\nilovefishc\rcom".splitlines("True"))
+# ['www\n', 'ilovefishc\r', 'com']
+
+# join(iterable) 字符串拼接
+print(".".join(["www", "ilovefishc", "com"]))
+# www.ilovefishc.com
+
+# split() 方法常常被应用于对数据的解析处理，那么考考大家，如果要从字符串 "https://ilovefishc.com/html5/index.html"
+# 中提取出 "ilovefishc.com"，使用 split() 方法应该如何实现呢？
+url = "https://ilovefishc.com/html5/index.html"
+parsed_url = url.split("https://")[1].split("/")[0]
+print(parsed_url)
+# ilovefishc.com
+
+print(",\n".join("FishC"))
+# F,
+# i,
+# s,
+# h,
+# C
+
+```
+
+
+
+## ==位移加密与同行字符串==
+
+```python
+# 位移加密（凯撒密码）  同行键盘字符串
+# 凯撒密码是一种通过位移加密的方法，对 26 个（大小写）字母进行位移加密，比如下方是正向位移 6 位的字母对比表：
+# 明文字母表如下
+# ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz
+# 密文字母表如下
+# GHIJKLMNOPQRSTUVWXYZABCDEF
+# 所以，如果给定加密的明文是：
+# I love FishC
+# 那么程序 +6 加密后输出的密文便是：
+# O rubk LoynI
+# text = "I love FishC"
+# position = 6
+# text = "I love FishC"
+# position = -6
+# text_encryption : C fipy ZcmbW
+text = input("请输入需要加密的明文（只支持英文字母）：")
+position = int(input("请输入移动的位数："))
+char_encryption = []
+for char in text:
+    if char == " ":
+        char_encryption.append(" ")
+    else:
+        temp = ord(char) + position
+        if 97 <= temp <= 122 or 65 <= temp <= 90:
+            char_encryption.extend(chr(temp))
+        elif temp > 122:
+            char_encryption.extend(chr(temp - 122 + 97 - 1))
+        elif 90 < temp < 97 and 65 <= ord(char) <= 90:
+            char_encryption.extend(chr(temp - 90 + 65 - 1))
+        elif 90 < temp < 97 and 97 <= ord(char) <= 122:
+            char_encryption.extend(chr(122 - (97 - temp - 1 )))
+        else:
+            char_encryption.extend(chr(90 - (65 - temp - 1 )))
+    text_encryption = "".join(char_encryption)
+print(text_encryption)
+
+
+# 同行键盘字符串
+# 给定一个字符串数组 words，只返回可以使用在美式键盘同一行的字母打印出来的单词
+str1 = "qwertyuiop"
+str2 = "asdfghjkl"
+str3 = "zxcvbnm"
+words = ["Twitter", "TOTO", "FishC", "Python", "ASL"]
+words_new = []
+for word in words:
+    i = 1
+    if str1.find(word[0].lower()) != -1:
+        while i < len(word):
+            if str1.find(word[i].lower()) != -1:
+                i += 1
+            else:
+                break
+    elif str2.find(word[0].lower()) != -1:
+        while i < len(word):
+            if str2.find(word[i].lower()) != -1:
+                i += 1
+            else:
+                break
+    else:
+        while i < len(word):
+            if str3.find(word[i].lower()) != -1:
+                i += 1
+            else:
+                break
+    if i == len(word):
+        words_new.append(word)
+print(words_new)
+# ['Twitter', 'TOTO', 'ASL']
 
 ```
 
