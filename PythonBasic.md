@@ -1691,7 +1691,7 @@ print(s3)
 # 题目要求：编写代码，将奇数下标的数字转换为相对于上一个字母偏移后的字母。
 s = "a1b2c3"
 # # ord 将字母转换成ASCII， chr 将ASCII转换成字母
-# print(ord("a"))
+# print(ord("A"), ord("Z"),ord("a"))
 # # 97
 # print(chr(97))
 # # a
