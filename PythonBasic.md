@@ -2140,3 +2140,255 @@ print(words_new)
 
 
 
+## ==format 格式化字符串==
+
+```python
+# format 格式化字符串
+# "{} {}".format(value1, value2) 将变量插入字符串
+year = 2025
+print("正式开始学习于{}年".format(year))
+# 正式开始学习于2025年
+print("正式开始{}于{}年".format("学习","2025"))
+# 正式开始学习于2025年
+print("正式开始{1}于{0}年".format("学习","2025"))
+# 正式开始2025于学习年
+print("{1}正式开始{1}于{0}年".format("学习","2025"))
+# 2025正式开始2025于学习年
+print("{year}正式开始{learn}于{year}年".format(learn = "学习",year = "2025"))
+# 2025正式开始学习于2025年
+print("{name}于{1}开始学习{0}".format("python", "2025", name = "贪影战"))
+
+# 在字符串中输出{}
+print("{},{},{}".format(1, "{}", 2))
+# 1,{},2
+# 两层括号是转义
+print("{},{{}},{}".format(1, 2))
+# 1,{},2
+
+# format_spec     ::=  [[fill]align][sign][#][0][width][grouping_option][.precision][type]
+# align
+# '<'	强制字符串在可用空间内左对齐（默认）
+# '>'	强制字符串在可用空间内右对齐
+# '='	强制将填充放置在符号（如果有）之后但在数字之前的位置（这适用于以 “+000000120” 的形式打印字符串）
+# '^'	强制字符串在可用空间内居中
+# 用数字类型（其它类型不支持，会报错）的可感知正负的0填充
+print("{:^10}".format(250))
+#    250
+print("{:=10}".format(250))
+#        250
+print("{1:>10}{0:<10}".format(520, 250))
+#        250520
+print("{left:>10}{right:<10}".format(right = 520, left = 250))
+#        250520
+
+# 用数字类型（其它类型不支持，会报错）的可感知正负的0填充
+print("{:010}".format(-250))
+# -000000250
+print("{1:%>10}{0:%<10}".format(520, 250))
+# 一对{}转义出一个普通的花括号{}
+print("{{0}}".format(1))
+# {0}
+print("{{{0}}}".format(1))
+# {1}
+print("{{{{0}}}}".format(1))
+# {{0}}
+print("{{{{{0}}}}}".format(1))
+# {{1}}
+
+# sign
+# '+'	正数在前面添加正号（+），负数在前面添加负号（-）
+# '-'	只有负数在前面添加符号（-），默认行为
+# 空格	正数在前面添加一个空格，负数在前面添加负号（-）
+# 设置千位分隔符，它有两个值可以选择 —— ',' 或 '_'
+print("{:+}{:-}{:-}{: }".format(520, 250, -250, 250))
+# +520250-250 250
+print("{:,}".format(1234))
+print("{:_}".format(1234))
+
+# .precision 适用非整数
+# 对于以 'f' 或 'F' 格式化的浮点数值来说，是限定小数点后显示多少个数位
+# 对于以 'g' 或 'G' 格式化的浮点数值来说，是限定小数点前后共显示多少个数位
+# 对于非数字类型来说，限定最大字段的大小（换句话说就是要使用多少个来自字段内容的字符）
+# 对于整数来说，则不允许使用该选项值
+print('{} {:.2f}'.format('Pi =', 3.1415))
+# Pi = 3.14
+print('{} {:.2g}'.format('Pi =', 3.1415))
+# Pi = 3.1
+print("{:.6}".format("I love Python"))
+# I love
+
+# type
+# 适用整数
+# 'b'	将参数以二进制的形式输出
+# 'c'	将参数以 Unicode 字符的形式输出
+# 'd'	将参数以十进制的形式输出
+# 'o'	将参数以八进制的形式输出
+# 'x'	将参数以十六进制的形式输出
+# 'X'	将参数以十六进制的形式输出
+# 'n'	跟 'd' 类似，不同之处在于它会使用当前语言环境设置的分隔符插入到恰当的位置
+# None	跟 'd' 一样
+# #     参数以二进制、八进制或十六进制在字符串中输出的时候，会自动追加前缀 "0b"、"0o" 和 "0x"。
+print("{:b}".format(80))
+# 1010000
+print("{:c}".format(80))
+# P
+print("{:o}".format(80))
+# 120
+print("{:x}".format(80))
+# 50
+print("{:#x}".format(80))
+# 0x50
+
+# e'	将参数以科学记数法的形式输出（以字母 'e' 来标示指数，默认精度为 6）
+# 'E'	将参数以科学记数法的形式输出（以字母 'E' 来标示指数，默认精度为 6）
+# 'f'	将参数以定点表示法的形式输出（“不是数” 用 'nan' 标示，无穷用 'inf' 标示，默认精度为 6）
+# 'F'	将参数以定点表示法的形式输出（“不是数” 用 'NAN' 标示，无穷用 'INF' 标示，默认精度为 6）
+# 'g'	通用格式，小数以 'f' 形式输出，大数以 'e' 的形式输出
+# 'G'	通用格式，小数以 'F' 形式输出，大数以 'E' 的形式输出示
+# 'n'	跟 'g' 类似，不同之处在于它会使用当前语言环境设置的分隔符插入到恰当的位置
+# '%'	以百分比的形式输出（将数字乘以 100 并显示为定点表示法（'f'）的形式，后面附带一个百分号
+# None	类似于 'g'，不同之处在于当使用定点表示法时，小数点后将至少显示一位；默认精度与给定值所需的精度一致
+print("{:e}".format(3.1415))
+# 3.141500e+00
+print("{:g}".format(12345678))
+# 1.23457e+07
+print("{:g}".format(1234.5678))
+# 1234.57
+print("{:%}".format(0.98))
+# 98.000000%
+print("{:.2%}".format(0.98))
+# 98.00%
+
+print("{:{fill}{align}{width}.{prec}{type}}".format(3.1415, fill="+", align="^", width=10, prec=2, type="g"))
+# +++3.1++++
+
+
+# ——————————————————————————————————————————————————————————
+# f-string(python 3.6以后版本)
+# 语法糖：指计算机语言中添加的某种语法，这种语法对语言的功能没有影响，但是更方便程序员使用，语法糖让程序更加简洁，有更高的可读性。
+year = 2025
+print(f"今年是{year}年")
+# 今年是2025年
+print(f"1+1={1 + 1}，2的平方是{pow(2, 2)}，3的立方是{pow(3, 3)}")
+# 1+1=2，2的平方是4，3的立方是27
+print(f"{-520:010}")
+# -000000520
+print(f"{12345678:,}")
+# 12,345,678
+print(f"{3.1415:.2f}")
+# 3.14
+print(f"{3.1415:+^10.3g}")
+# +++3.14+++
+fill = "+"
+align = "^"
+width = 10
+prec = 3
+type = "g"
+print(f"{3.1415:{fill}{align}{width}.{prec}{type}}")
+# +++3.1++++
+
+```
+
+
+
+## 格式化练习
+
+```python
+# 格式化练习
+# 请编写一个程序，统计字符串中的单词个数（“单词”以空格进行分隔）
+# str1 = ""
+# 输出：0
+# str1 = "Python"
+# 输出：1
+str1 = "I love FishC"
+# 输出：3
+words = str1.split()
+print(len(words))
+
+# 请编写一个程序，将用户输入的字符串重新格式化，使得字母和数字相互分隔（即一个字母一个数字相互间隔）
+# str2 = "FishC1314"
+# 输出：F1i3s1h4C
+# str2 = "FishC520"
+# 输出：字符串中数字和字母的数量不满足重新格式化的条件
+str2 = "Python6543210"
+# 输出：6P5y4t3h2o1n0
+alp = 0
+alptemp = []
+num = 0
+numtemp = []
+str_new = []
+for word in str2:
+    if word.isalpha():
+        alp = alp + 1
+        alptemp.append(word)
+    elif word.isdecimal():
+        num = num + 1
+        numtemp.append(word)
+if alp - num == 1:
+    for i in range(len(str2)):
+        print(i, i % 2)
+        if i % 2 != 0:
+            str_new.append(numtemp[i // 2])
+        else:
+            str_new.append(alptemp[i // 2])
+    print("".join(str_new))
+elif alp - num == -1:
+    for i in range(len(str2)):
+        if i % 2 != 0:
+            str_new.append(alptemp[i // 2])
+        else:
+            str_new.append(numtemp[i // 2])
+    print("".join(str_new))
+else:
+    print("字符串中数字和字母的数量不满足重新格式化的条件")
+
+```
+
+
+
+## 压缩与解压
+
+```python
+# 压缩与解压
+# 利用字符重复出现的次数，编写一个程序，实现基本的字符串压缩功能。比如，字符串 FFiiiisshCCCCCC 压缩后变成 F2i4s2h1C6（15字符 -> 10字符，66% 压缩率）。
+# 对于重复次数小于 3 的字符，我们的程序应该选择不对其进行压缩。
+string = "FFiiiisshCCCCCC"
+# 压缩后：FFi4sshC6
+# 压缩率为：60.00%
+# string = input("请输入待压缩字符串：")
+string_comp = []
+temp = 0
+char = 0
+while char < len(string):
+    index = string.find(string[char], char)
+    while index != -1:
+        temp += 1
+        index = string.find(string[char], char + temp)
+    else:
+        if temp < 3:
+            for i in range(temp):
+                string_comp.append(string[char])
+        else:
+            string_comp.append(string[char])
+            string_comp.append(str(temp))
+    char = char + temp
+    temp = 0
+string_comp1 = ''.join(string_comp)
+print("压缩后的字符串：", string_comp1)
+print("压缩率为：", f"{len(string_comp) / len(string):.2%}")
+
+# 解压
+string_decomp = []
+char = 0
+while char < len(string_comp1):
+    if string_comp1[char].isalpha():
+        string_decomp.append(string_comp1[char])
+    elif string_comp1[char].isdigit():
+        for i in range(int(string_comp1[char]) - 1):
+            string_decomp.append(string_comp1[char - 1])
+    char += 1
+string_decomp1 = ''.join(string_decomp)
+print("解压后的字符串:", string_decomp1)
+
+```
+
