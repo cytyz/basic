@@ -686,7 +686,7 @@ else:
 
 
 
-# 7.列表
+# 7.列表list
 
 ## 列表与切片
 
@@ -1460,7 +1460,7 @@ print(result)
 
 
 
-# 8.元组
+# 8.元组tuple
 
 rhyme = (1, 2, 3, 4, 5, "上山打老虎")
 
@@ -1596,7 +1596,7 @@ print(tuple_time1)
 
 
 
-# 9.字符串
+# 9.字符串string
 
 ## 大小写转换与对齐
 
@@ -2391,4 +2391,295 @@ string_decomp1 = ''.join(string_decomp)
 print("解压后的字符串:", string_decomp1)
 
 ```
+
+
+
+# 10.序列sequence
+
+## ==序列==
+
+enumerate() 用于返回一i个枚举对象，它的功能就是将可迭代对象中的每个元素及从0开始的序号共同构成一个二元组的列表
+
+zip() 用于创建一个聚合多个可迭代对象的迭代器它会将作为参数传入的每个可迭代对象依次组合成元组，即第i个元组包含来自每个参数的第i个元素
+zip 当长度不一时，以最短的为准，长的会舍弃掉若要保留长的部分，需要调用itertools
+
+map() 它会根据提供的函数对指定的可迭代对象的每个元素进行运算，并将 返回运算结果 的迭代
+和zip一样，以最短的为准
+
+filter() 它会根据提供的函数对指定的可迭代对象的每个元素进行运算，并将 运算结果为真的元素 以迭代器的形式返回
+
+迭代器与可迭代对象
+迭代器一定是一个可迭代对象，可迭代对象可以重复使用，而迭代器是一次性的，临时存储
+iter 将可迭代对象转换成一次性的迭代器， 所有的可迭代对象都可以转换成一次性的迭代器
+next 逐个将迭代器中的元素提取出来，使用一次提取一个
+
+```python
+# 序列
+x = "FishC"
+y = [1, 2, 3]
+# 删除 x, y这个变量，使其不再指向任何对象
+del x, y
+x = [1, 2, 3, 4, 5]
+del x[1:4]
+print(x)
+# [1, 5]
+y = [1, 2, 3, 4 ,5]
+y[1:4] = []
+print(y)
+# [1, 5]
+x = [1, 2, 3, 4, 5]
+del x[::2]
+print(x)
+# [2, 4]
+
+# max, min 按Ascii值对字母进行排序
+print(max("FiShC"))
+# i
+s = []
+# default 当调用函数时，如果没有提供该参数的值，将使用默认值
+print(min(s, default="啥都没有"))
+# 啥都没有
+
+# len读取的长度不能超过pow(2,63) - 1
+
+s = [1, 2, 3, 0, 6]
+print(sum(s))
+# 12
+print(sum(s, start=100))
+# 112
+
+# sorted 排序但不改变，并给出返回值
+# .sort 排序且改变，但不给出返回值
+print(sorted(s), s)
+# [0, 1, 2, 3, 6] [1, 2, 3, 0, 6]
+s.sort()
+print(s)
+# [0, 1, 2, 3, 6]
+# key  关键值，作为根据 如排序依据
+t = ["FishC", "Apple", "Book", "Banana", "Pen"]
+print(sorted(t))
+# ['Apple', 'Banana', 'Book', 'FishC', 'Pen']
+print(sorted(t, key=len))
+# ['Pen', 'Book', 'FishC', 'Apple', 'Banana']
+
+# reversed 返回的是一个迭代器对象，需要list进行转换才能正常使用
+print(reversed(t))
+# <list_reverseiterator object at 0x000001D1AEC65CC0>
+print(list(reversed(t)))
+# ['Pen', 'Banana', 'Book', 'Apple', 'FishC']
+
+print(list(reversed(sorted("FishC520"))))
+# ['s', 'i', 'h', 'F', 'C', '5', '2', '0']
+
+# all() 判断是否全部为真 any() 是否存在某个元素的值为真
+x = [1, 1, 0]
+y = [1, 1, 9]
+print(all(x), all(y), any(x), any(y))
+# False True True True
+
+# ————————————————————————————————————————————
+# enumerate() 用于返回一i个枚举对象，它的功能就是将可迭代对象中的每个元素及从0开始的序号共同构成一个二元组的列表
+print(list(enumerate(x)))
+# [(0, 1), (1, 1), (2, 0)]
+print(list(enumerate(x, start=10)))
+# [(10, 1), (11, 1), (12, 0)]
+
+# zip() 用于创建一个聚合多个可迭代对象的迭代器
+# 它会将作为参数传入的每个可迭代对象依次组合成元组，即第i个元组包含来自每个参数的第i个元素
+# zip 当长度不一时，以最短的为准，长的会舍弃掉
+# 若要保留长的部分，需要调用itertools
+print(list(zip(x, y)))
+z = [1, 4, 5]
+print(list(zip(x, y, z)))
+# [(1, 1, 1), (1, 1, 4), (0, 9, 5)]
+z = "FishC"
+print(list(zip(x, y, z)))
+# [(1, 1, 'F'), (1, 1, 'i'), (0, 9, 's')] 舍弃了hC
+import itertools
+zipped = itertools.zip_longest(x, y, z)
+print(list(zipped))
+# [(1, 1, 'F'), (1, 1, 'i'), (0, 9, 's'), (None, None, 'h'), (None, None, 'C')]
+
+# map() 它会根据提供的函数对指定的可迭代对象的每个元素进行运算，并将 返回运算结果 的迭代器
+# 和zip一样，以最短的为准
+mapped = map(ord, "FishC")
+print(list(mapped))
+# [70, 105, 115, 104, 67]
+mapped = map(pow, [2, 3, 10], [5, 2, 3])
+print(list(mapped))
+# [32, 9, 1000]
+mapped = map(max, [1, 3, 5], [2, 2, 2], [0, 3, 9, 8])
+print(list(mapped))
+# [2, 3, 9] 舍弃了8
+
+# filter() 它会根据提供的函数对指定的可迭代对象的每个元素进行运算，并将 运算结果为真的元素 以迭代器的形式返回
+print(list(filter(lambda x: x % 2 == 0, [1, 2, 3, 4])))
+# [2, 4]
+print(list(filter(str.islower, "FishC")))
+# ['i', 's', 'h']
+
+# 迭代器与可迭代对象
+# 迭代器一定是一个可迭代对象，可迭代对象可以重复使用，而迭代器是一次性的，临时存储
+mapped = map(ord, "FishC")
+print(list(mapped))
+# [70, 105, 115, 104, 67]
+print(list(mapped))
+# []
+# iter 将可迭代对象转换成一次性的迭代器， 所有的可迭代对象都可以转换成一次性的迭代器
+# next 逐个将迭代器中的元素提取出来，使用一次提取一个
+x = [1, 2, 3]
+y = iter(x)
+print(type(x), type(y))
+# <class 'list'> <class 'list_iterator'>
+print(next(y, "元素提取完毕"))
+# 1
+print(next(y, "元素提取完毕"))
+# 2
+print(next(y, "元素提取完毕"))
+# 3
+print(next(y, "元素提取完毕"))
+# 元素提取完毕
+
+matrix = [[1, 3, 2],
+          [5, 4, 6],
+          [8, 7, 9]]
+mapped = map(sorted, matrix)
+print(list(mapped))
+# [[1, 2, 3], [4, 5, 6], [7, 8, 9]]
+
+print(list(filter(str.islower, "FishC")))
+# ['i', 's', 'h']
+print([i for i in "FishC" if i.islower()])
+# ['i', 's', 'h']
+
+```
+
+
+
+## ==判断子序列与 查找最大奇数==
+
+```python
+# 判断子序列与 查找最大奇数
+# 给定字符串 s 和 t ，请编程判断 s 是否为 t 的子序列。
+# 字符串的子序列是原始字符串删除一些（也可以不删除）字符而不改变剩余字符相对位置形成的新字符串（例如，"ace" 是 "abcde" 的子序列，而 "aec" 则不是）。
+s = "FishC"
+# t = "FiiisjjhkkCBA"
+t = "FijkhsC"
+# s = input("请输入字符串s：")
+# t = input("请输入字符串t：")
+temp = 0
+j = 0
+while j < len(s):
+    index = t.find(s[j])
+    while index != -1:
+        j += 1
+        if j < len(s):
+            index = t.find(s[j], index)
+        else:
+            break
+    else:
+        break
+if j == len(s):
+    print("字符串 s 是字符串 t 的子序列")
+else:
+    print("字符串 s 不是字符串 t 的子序列")
+
+# 给定一个字符串 s，请编程求出该字符串中的最大奇数。
+# s1 = "43383"
+# 输出：43383
+# s1 = "5926"
+# 输出：59
+# s1 = "966"
+# 输出：9
+s1 = "64062"
+# 输出：0
+s2 = []
+for i in range(len(s1) - 1, -1, -1):
+    if int(s1[i]) % 2 != 0:
+        for j in range(i + 1):
+            s2.append(s1[j])
+        break
+if len(s2) == 0:
+    print("0")
+else:
+    print("".join(s2))
+
+```
+
+
+
+## 奇偶排序 翻转单词顺序
+
+```python
+# 奇偶排序 翻转单词顺序
+# 给定一个整数列表，请编程来调整该列表中整数的顺序，使得所有奇数排好序后放在数组的前半部分，所有偶数排好序后放在数组的后半部分。
+# 比如给定的整数列表是 [1, 8, 7, 3, 6, 5, 4, 2]，那么调整后的结果应该是 [1, 3, 5, 7, 2, 4, 6, 8]。
+list1 = [1, 8, 7, 3, 6, 5, 4, 2]
+odd = []
+even = []
+list2 = []
+for i in range(len(list1)):
+    if list1[i] % 2 == 0:
+        even.append(list1[i])
+    else:
+        odd.append(list1[i])
+list2.extend(sorted(odd))
+list2.extend(sorted(even))
+print(list2)
+# [1, 3, 5, 7, 2, 4, 6, 8]
+
+#  翻转单词顺序。
+# 用户输入一个英文句子，请编程翻转句子中单词的顺序，但单词内字符的顺序不变。为简单起见，标点符号和普通字母一样处理。
+# 例如输入字符串是 "I love FishC."，则输出 "FishC. love I"。
+# 注意1：用户输入的字符串可能会在前面或者后面包含任意数量的空格，但是反转后的结果将会去除这些空格（例如输入字符串是 "   I love FishC.   "，结果依然输出 "FishC. love I"）。
+# 注意2：用户输入的字符串中，单词之间可能不止一个空格，但是反转后的结果将统一使用一个空格作为单词之间的间隔（例如输入字符串是 "I   love        FishC."，结果依然输出 "FishC. love I"）
+strings1 = "    I   love     FishC."
+reverser = list(reversed(strings1.split()))
+strings2 = ' '.join(reverser)
+print(strings2)
+# FishC. love I
+
+```
+
+
+
+## 密室打卡（打点计时器 zip)
+
+```python
+# 密室打卡（打点计时器 zip)
+# 假设有一个密室，每次只能放一个人进去，在进去之前和出来之后都要求摁一下门口的打卡机按钮，打卡机会依次将名字和进出时间戳记录为以下的格式：
+import decimal
+times = [1, 3, 3.5, 6.5, 9.5, 10, 10.8]
+names = ["A", "B", "C", "D", "E", "F", "G"]
+# 这里表示：
+# A 君是从时间戳为 0 的时候进入，从时间戳为 1 的时候出来，总共耗时为 1
+# B 君是从时间戳为 1 的时候进入，从时间戳为 3 的时候出来，总共耗时为 2
+# C 君是从时间戳为 3 的时候进入，从时间戳为 3.5 的时候出来，总共耗时为 0.5
+# ...
+# G 君是从时间戳为 10 的时候进入，从时间戳为 10.8 的时候出来，总共耗时为 0.8
+# OK，现在要求大家编写代码，统计给定的数据，打印耗时最长和最短的人员名称。
+times_use = []
+use = 0
+for time in range(len(times)):
+    if time == 0:
+        times_use.append(float(times[time]))
+    else:
+        use = decimal.Decimal(str(times[time])) - decimal.Decimal(str(times[time - 1]))
+        times_use.append(float(use))
+zipped = zip(times_use, names)
+temp1 = []
+temp2 = []
+for i in zipped:
+    if i[0] == min(times_use):
+        temp1.append(i[1])
+    if i[0] == max(times_use):
+        temp2.append(i[1])
+print("速度最快的是：", temp1, "耗费时间是：", min(times_use))
+# 速度最快的是： ['C', 'F'] 耗费时间是： 0.5
+print("速度最慢的是：", temp2, "耗费时间是：", max(times_use))
+# 速度最慢的是： ['D', 'E'] 耗费时间是： 3.0
+
+```
+
+
 
