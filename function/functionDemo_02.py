@@ -19,7 +19,7 @@ def judge(text, text1):
     temp = []
     i = 0
     if len(text1) % 2 == 0:
-        while i < len(text1) - 1:
+        while i < len(text1):
             if i <= len(text1) // 2 - 1:
                 temp.append(text1[i])
                 i += 1

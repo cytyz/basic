@@ -3218,7 +3218,37 @@ print(s1 == s2)
 
 
 
-### 破解 MD5 哈希加密
+## 集合的哈希表效率提升
+
+```python
+import random
+import timeit
+
+haystack = [random.randint(1, 10000000) for i in range(10000000)]
+needles = [random.randint(1, 1000) for i in range(1000)]
+
+# 请在此处添加一行代码，使得查找过程的执行效率提高 10000 倍以上。
+haystack = set(haystack)
+# 集合有哈希表的支持，速度快，空间换时间
+
+def find():
+    found = 0
+    for each in needles:
+        if each in haystack:
+            found += 1
+
+    print(f"一共找到{found}个匹配。")
+
+t = timeit.timeit("find()", setup="from __main__ import find", number=1)
+print(f"查找过程一共消耗{t}秒。")
+
+```
+
+
+
+
+
+## 破解 MD5 哈希加密
 
 ```python
 # 利用 dict() 来实现交集和并集  破解 MD5 哈希加密
@@ -3274,3 +3304,306 @@ for i in range(1000000):
 # 655d03ed12927aada3d5bd1f90f06eb7: 960520
 
 ```
+
+
+
+# 13.函数
+
+## 函数的创建和调用
+
+```python
+# 函数
+# 创建和调用
+def myfunc():
+    # pass 空语句，作为占位符使用，在规划功能时占位
+    pass
+myfunc()
+def myfunc():
+    for i in range(3):
+        print("I Love FishC")
+myfunc()
+# I Love FishC
+# I Love FishC
+# I Love FishC
+
+# 函数的参数
+# 形式参数与实际参数    函数定义时用的是形式参数，函数调用时用的是实际参数
+def myfunc(name, times):
+    for i in range(times):
+        print(f"I Love {name}.")
+myfunc("Python", 3)
+# I Love Python.
+# I Love Python.
+# I Love Python.
+
+# 函数的返回值 return    执行return时结尾，不会再运行后面的语句
+# BIF 指内置函数 build-in function
+# 函数在执行完所有语句后会默认隐式地返回一个 none 值
+def div(x, y):
+    z = x // y
+    return z
+print(div(4, 2))
+# 2
+def div(x, y):
+    return x // y
+print(div(4, 2))
+# 2
+def div(x, y):
+    if y == 0:
+        return "除数不能为0！"
+    else:
+        return x // y
+print(div(4, 2))
+# 2
+print(div(4, 0))
+# 除数不能为0！
+
+def div(x, y):
+    if y == 0:
+        return "除数不能为0！"
+    return x // y
+print(div(4, 2))
+# 2
+print(div(4, 0))
+# 除数不能为0！
+def myfunc():
+    # pass 空语句，作为占位符使用，在规划功能时占位
+    pass
+print(myfunc())
+# None
+
+```
+
+
+
+## 注册与登录模块
+
+```python
+# 注册与登录模块
+# 请编写一个实现【注册】和【登陆】功能的代码，这次要求将不同的功能封装成独立的函数
+# 编写 4 个函数分别用于获取用户指令（get_int()）、注册（register()）、登陆（login()）、MD5加密（encrypt()）
+# 使用一个 Python 的字典作为数据库。
+# 注册时需验证用户名是否已存在于数据库
+# 登陆时需验证用户名和密码是否匹配
+# 密码保存需使用 MD5 加密
+import hashlib
+print("欢迎来到鱼C论坛~")
+user = dict()
+def get_int():
+    print("==========================")
+    print("1.注册")
+    print("2.登录")
+    print("3.退出")
+    _ = input("请输入指令：")
+    return _
+
+def register():
+    print("==========================")
+    user_name = input("请输入用户名（输入q退出注册）：")
+    if user_name == "q":
+        return user
+    while user_name in user:
+        user_name = input("用户名重复，请重新输入用户名（输入q退出注册）：")
+        if user_name == "q":
+            return user
+    user_pwd = input("请输入密码：")
+    user[user_name] = encrypt(user_pwd)
+    print("恭喜，注册成功~")
+    return user
+
+def login():
+    print("==========================")
+    user_name = input("请输入用户名（输入q退出登录）：")
+    if user_name == "q":
+        return 0
+    while user_name not in user:
+        print("用户名不存在。")
+        user_name = input("请重新输入用户名（输入q退出登录）：")
+        if user_name == "q":
+            return 0
+    user_pwd = input("请输入密码：")
+    if user_pwd == "q":
+        return 0
+    while encrypt(user_pwd) != user[user_name]:
+        print("密码错误！")
+        user_pwd = input("请重新输入密码：")
+    print("恭喜，登录成功~")
+    return 0
+
+def encrypt(pwd):
+    pwd = hashlib.md5(str(pwd).encode("utf-8")).hexdigest()
+    return pwd
+
+while True:
+    select = get_int()
+    if select == "1":
+        register()
+    elif select == "2":
+        login()
+    elif select == "3" :
+        break
+    else:
+        print("指令错误，请重新输入！")
+
+```
+
+
+
+## ==函数的参数类型1==
+
+```python
+# 位置参数 在定义函数时将参数位置固定了下来，而这类参数称之为位置参数
+def myfunc(s, vt , o):
+    return "".join([o, vt, s])
+print(myfunc("我", "打了", "小甲鱼"))
+# 小甲鱼打了我
+
+# 关键字参数 更适用鱼参数多的函数
+print(myfunc(o="我", vt="打了", s="小甲鱼"))
+# 我打了小甲鱼
+# 混用，位置参数要在关键字参数之前
+print(myfunc("小甲鱼", o="我", vt="打了"))
+# 我打了小甲鱼
+
+# 默认参数 函数在定义时指定默认的参数值    默认参数要放在最后
+def myfunc(s, vt, o="小甲鱼"):
+    return "".join((o, vt, s))
+print(myfunc("香蕉","吃"))
+# 小甲鱼吃香蕉
+def myfunc(vt, s="苹果", o="小甲鱼"):
+    return "".join((o, vt, s))
+print(myfunc("吃"))
+# 小甲鱼吃苹果
+
+# /  斜杠左侧必须传入位置参数
+# *  斜杠右侧必须传入关键字参数， 这就是一个匿名的收集参数
+print(help(abs), help(sum))
+# 如abs(x, /)    sun(iterable, /, start=0)
+print(abs(-1.5))
+# 1.5   abs(x=-1.5)则会报错
+print(sum([1, 2, 3], 4))
+# 10
+print(sum([1, 2, 3], start=4))
+# 10
+def abc(a, /, b, c):
+    print(a, b, c)
+abc(1, b=2, c=3)
+# 1 2 3
+def abc(a, *, b, c):
+    print(a, b, c)
+abc(1, b=2, c=3)
+# 1 2 3
+abc(a=1, b=2, c=3)
+# # 1 2 3
+
+```
+
+
+
+## ==回文字符串拼音版 与 模拟栈==
+
+```python
+# 回文字符串拼音版
+# 提示一：放宽要求后，只要文字的发音构成前后回文，即认定为符合要求。
+# 提示二：将汉字转换为对应拼音的方法 -> https://fishc.com.cn/thread-213439-1-1.html
+# 提示三：请将各个独立的功能封装为函数。
+from xpinyin import Pinyin
+def input_text():
+    text = input("请输入一段话：")
+    while len(text) <= 1:
+        text = input("字数太少，请重新输入：")
+    return text
+
+def changepy(text):
+# 转换成拼音
+    text1 = Pinyin().get_pinyin(text, ",")
+    text1 = text1.split(",")
+    return text1
+
+def judge(text, text1):
+    temp = []
+    i = 0
+    if len(text1) % 2 == 0:
+        while i < len(text1) - 1:
+            if i <= len(text1) // 2 - 1:
+                temp.append(text1[i])
+                i += 1
+            else:
+                if temp.pop() != text1[i]:
+                    print(f"{text}不是回文")
+                    break
+                else:
+                    i += 1
+    else:
+        while i < len(text1):
+            if i == len(text1) // 2:
+                i += 1
+                continue
+            elif i <= len(text1) // 2 - 1:
+                temp.append(text1[i])
+                i += 1
+            else:
+                if temp.pop() != text1[i]:
+                    print(f"{text}不是回文")
+                    break
+                else:
+                    i += 1
+    if i >= len(text1):
+        print(f"{text}是回文")
+
+text = input_text()
+text1 = changepy(text)
+judge(text1, text1)
+# 请输入一段话：前任只认钱
+# ['qian', 'ren', 'zhi', 'ren', 'qian']是回文
+
+# 利用函数模拟创建【栈】的数据结构操作
+stack_like = []
+def input_text1():
+    while True:
+        command = input("请输入指令（push/pop/top/exit）：")
+        if command == "push":
+            stack_push()
+        elif command == "pop":
+            stack_pop()
+        elif command == "top":
+            stack_top()
+        elif command == "exit":
+            break
+        else:
+            print("请输入正确的指令：")
+
+def stack_push():
+    num = input("请输入将要压入栈中的值：")
+    stack_like.append(num)
+    temp = [i for i in reversed(stack_like)]
+    print("栈:")
+    for j in range(len(stack_like)):
+        print(temp[j])
+
+def stack_pop():
+    if len(stack_like) == 0:
+        print("栈已空")
+        return 0
+    print(stack_like.pop())
+    temp = [i for i in reversed(stack_like)]
+    print("栈:")
+    for j in range(len(stack_like)):
+        print(temp[j])
+
+
+def stack_top():
+    if len(stack_like) == 0:
+        print("栈已空")
+        return 0
+    temp = [i for i in reversed(stack_like)]
+    print(temp[0])
+
+input_text1()
+
+```
+
+
+
+## ==函数的参数类型2==
+

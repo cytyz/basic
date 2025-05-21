@@ -24,6 +24,21 @@
 # print(s3)
 # ['A', 'A']
 
+# 方法二：
+s = input("请输入一个字符串：")
+
+res = []
+for each in s:
+    if res and res[-1].lower() == each.lower() and res[-1] != each:
+        res.pop()
+    else:
+        res.append(each)
+
+for each in res:
+    print(each, end='')
+
+
+
 # 给定的字符串 s 是按照如下规则存放的：它的偶数下标为小写英文字母，奇数下标为正整数。
 # 题目要求：编写代码，将奇数下标的数字转换为相对于上一个字母偏移后的字母。
 s = "z1a2c3"
