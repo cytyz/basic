@@ -957,6 +957,28 @@ if major_num >= (len(nums) // 2):
 else:
     print("不存在主要元素")
 
+# 第二种解法：摩尔投票法
+# 摩尔投票法分为两个阶段：
+# 对抗阶段：分属两个候选人的票数进行两两对抗抵消
+# 计数阶段：计算对抗结果中最后留下的候选人票数是否有效
+nums = [2, 2, 4, 2, 3, 6, 2]
+
+# 对抗阶段
+major = nums[0]
+count = 0
+for each in nums:
+    if count == 0:
+        major = each
+    if each == major:
+        count += 1
+    else:
+        count -= 1
+
+# 统计阶段
+if nums.count(major) > len(nums) / 2:
+    print("主要元素是：", major)
+else:
+    print("不存在主要元素。")
 ```
 
 
@@ -1686,6 +1708,21 @@ print(pr)
 # s3 = ''.join(s2)
 # print(s3)
 # ['A', 'A']
+
+# 方法二：
+s = input("请输入一个字符串：")
+
+res = []
+for each in s:
+    if res and res[-1].lower() == each.lower() and res[-1] != each:
+        res.pop()
+    else:
+        res.append(each)
+
+for each in res:
+    print(each, end='')
+
+
 
 # 给定的字符串 s 是按照如下规则存放的：它的偶数下标为小写英文字母，奇数下标为正整数。
 # 题目要求：编写代码，将奇数下标的数字转换为相对于上一个字母偏移后的字母。
@@ -3606,4 +3643,709 @@ input_text1()
 
 
 ## ==函数的参数类型2==
+
+```python
+# 收集参数
+# 定义函数时不限制用户输入个数，
+# 形参前加*， 通过*将多个参数打包为元组， **将多个参数打包为字典
+# 定义时多个参数则置于函数最后位置，若不置于最后位置，则在收集参数后的参数只能是关键字参数（在使用时指定形参对应的实参）
+# *  斜杠右侧必须传入关键字参数， 这就是一个匿名的收集参数
+# 打包为元组
+def myfunc(start, *args):
+    print(f"有{len(args)}个无限制参数")
+    print(f"第二个参数是{args[1]}")
+myfunc(1, "tge", 35, [1, 3, "werf"])
+# 有3个无限制参数
+# 第二个参数是35
+
+# python在返回多个值时利用元组进行打包
+def myfunc(*args):
+    print(args)
+myfunc(1, 2, 3, 4, 5)
+# (1, 2, 3, 4, 5)  以元组形式打包返回
+def myfunc():
+    return 1, 2, 4
+print(myfunc())
+# (1, 2, 4)  以元组形式打包返回
+# 可以进行元组解包
+x, y, z = myfunc()
+print(x, y, z)
+# 1 2 4
+
+# 打包为字典
+def myfunc(**kwargs):
+    print(kwargs)
+myfunc(a=1, b=2, c=3)
+# {'a': 1, 'b': 2, 'c': 3}
+# 混合
+def myfunc(a, *b, **c):
+    print(a, b, c)
+myfunc(1, 2, 3, x=1, y=2, z=3)
+# 1 (2, 3) {'x': 1, 'y': 2, 'z': 3}
+
+# 解包参数 实参前加* 或** 实现解包，以此给形参赋值
+# * 解包成位置参数， **解包成关键字参数
+args = (1, 2, 3, 4)
+def myfunc(a, b, c ,d):
+    print(a, b, c, d)
+myfunc(*args)
+# 1 2 3 4
+
+kwargs = {"a": 1, "b": 2, "c": 3, "d": 4}
+myfunc(**kwargs)
+# 1 2 3 4
+
+```
+
+
+
+## ==罗马数字与数字的互转==
+
+```python
+# 罗马数字与数字的互转
+# 罗马数字包含 I、V、X、L、C、D、M 七种字符，分别表示数值 1、5、10、50、100、500、1000。
+# 编写一个函数，将指定的罗马字符转换为数字的形式。
+# 增加检测非法字符的功能
+# 简化版
+# enumerate 枚举
+# # 定义一个包含一些水果名称的列表
+# fruits = ['apple', 'banana', 'cherry']
+#
+# # 使用 enumerate 函数遍历列表
+# for index, fruit in enumerate(fruits):
+#     print(f"Index: {index}, Fruit: {fruit}")
+# 在这个例子中，enumerate(fruits) 返回一个枚举对象，其中包含了列表中每个元素的索引和值
+R2N = {"I": 1, "V": 5, "X": 10, "L": 50, "C": 100, "D": 500, "M": 1000}
+
+def rome_num2(rome):
+    num = 0
+    len2 = len(rome)
+    for i, j in enumerate(rome):
+        v = R2N[j]
+        if i < len2 - 1 and  v < R2N[rome[i + 1]]:
+            num -= v
+        else:
+            num += v
+    return num
+def input_rome2():
+    rome = input("请输入一个罗马字符：")
+    num = rome_num2(rome)
+    print(f"转换后的结果是：{num}")
+# input_rome2()
+
+# 数字转罗马数字
+N2R = [
+    (1000, "M"),
+    (900, "CM"),
+    (500, "D"),
+    (400, "CD"),
+    (100, "C"),
+    (90, "XC"),
+    (50, "L"),
+    (40, "XL"),
+    (10, "X"),
+    (9, "IX"),
+    (5, "V"),
+    (4, "IV"),
+    (1, "I"),
+]
+
+def num2roman(num):
+    r = []
+    for v, s in N2R:
+        while num >= v:
+            num -= v
+            r.append(s)
+        if num == 0:
+            break
+
+    return "".join(r)
+
+n = input("请输入一个整数：")
+r = num2roman(int(n))
+print(f"转换后的结果是：{r}")
+
+```
+
+
+
+## 函数作用域
+
+```python
+# 作用域
+# 作用域指一个变量可以被访问的范围
+# 局部作用域    函数内创建的变量
+# 全局作用域    函数外创建的变量
+# 当存在全局变量时，若在函数内创建同名局部变量，则在函数中创建一个同名的局部变量进行覆盖
+# global x  在函数内使用，创建全局变量
+
+# 嵌套函数 函数中创建一个内部函数
+# 内部函数无法在外部被直接调用，需要在其对应的外部函数中调用
+def funA():
+    x = 520
+    def funB():
+        x = 880
+        print(f"In funB, x={x}")
+    funB()
+    print(f"In funA, x={x}")
+
+funA()
+# In funB, x=880
+# In funA, x=520
+
+# nonlocal  可以在内部函数修改上一层外部函数的变量
+def funA():
+    x = 520
+    def funB():
+        nonlocal x
+        x = 880
+        print(f"In funB, x={x}")
+    funB()
+    print(f"In funA, x={x}")
+
+funA()
+# In funB, x=880
+# In funA, x=880
+
+# LEGB规则
+# Local 局部作用域  Enclosed 嵌套函数的外层函数作用域  Global 全局作用域  Build-In 内置作用域
+# 小则优先 范围小
+
+
+
+x = [1, 2, 3]
+def invert(x):
+    x = x[::-1]
+invert(x)
+print(x)
+# [1, 2, 3]
+
+x = [1, 2, 3]
+def invert(x):
+    x[:] = x[::-1]
+invert(x)
+print(x)
+# [3, 2, 1]
+
+
+x = 100
+def funA():
+    global x
+    x = 250
+    def funB():
+        # nonlocal x  此时funA的 x 为全局变量， 无局部变量 x 此时 nonlocal会报错
+        x = 520
+    funB()
+
+funA()
+print(x)
+# 250
+
+```
+
+
+
+## ==洗牌算法 —— Fisher-Yates 与斗地主==
+
+```python
+# 洗牌算法 —— Fisher-Yates 与斗地主
+# 对于该算法的实现描述如下（假设需要打乱 N 个数）：
+# 写下从 1 到 N 的数字
+# 获取一个 1 到剩下数字（包括这个数字）的随机数 k
+# 从低位开始，取出第 k 个数字（这个数字还没有被取出），把它写在独立的一个列表的最后一位
+# 重复前两个步骤，直到所有数据都被取出
+import random
+def fy_shuffle(data, num=1):
+    for i in range(num):
+        target = list(data)
+        result = []
+        while target:
+            pop_num = random.randint(0, len(target) - 1)
+            result.append(target.pop(pop_num))
+        print(f"第{i}次打乱后的结果：{"".join(result)}")
+    return "".join(result)
+
+def input_data():
+    data = input("请输入需要打乱的序列：")
+    num = int(input("请输入需要打乱的次数："))
+    print(f"最终的结果是：{"".join(fy_shuffle(data, num))}")
+
+    pass
+
+input_data()
+
+# 斗地主
+import random
+
+cards = ["♦1", "♦2", "♦3", "♦4", "♦5", "♦6", "♦7", "♦8", "♦9", "♦10", "♦J", "♦Q", "♦K",
+         "♥1", "♥2", "♥3", "♥4", "♥5", "♥6", "♥7", "♥8", "♥9", "♥10", "♥J", "♥Q", "♥K",
+         "♣1", "♣2", "♣3", "♣4", "♣5", "♣6", "♣7", "♣8", "♣9", "♣10", "♣J", "♣Q", "♣K",
+         "♠1", "♠2", "♠3", "♠4", "♠5", "♠6", "♠7", "♠8", "♠9", "♠10", "♠J", "♠Q", "♠K",
+         "☀", "🌙"]
+
+
+def fy_shuffle(x, n=1):
+    for i in range(n):
+        target = list(x)
+        result = []
+        while target:
+            r = random.randint(0, len(target) - 1)  # 步骤2
+            result.append(target.pop(r))  # 步骤3
+
+    return result
+
+
+def dealCards():
+    a = input("请输入第一位游戏玩家名称：")
+    b = input("请输入第二位游戏玩家名称：")
+    c = input("请输入第三位游戏玩家名称：")
+
+    r = {}
+    r[a], r[b], r[c] = [], [], []
+
+    new_cards = fy_shuffle(cards, 3)
+
+    for i in range(17):
+        r[a].append(new_cards.pop())
+        r[b].append(new_cards.pop())
+        r[c].append(new_cards.pop())
+
+    d = random.sample((a, b, c), 1)[0]
+    print(f"\n地主是：{d}\n")
+    r[d].extend((new_cards.pop(), new_cards.pop(), new_cards.pop()))
+
+    print(f"[{a}]拿到的牌是：{' '.join(r[a])}\n")
+    print(f"[{b}]拿到的牌是：{' '.join(r[b])}\n")
+    print(f"[{c}]拿到的牌是：{' '.join(r[c])}")
+
+
+dealCards()
+
+```
+
+
+
+## 闭包
+
+```python
+# 闭包  如果在一个内部函数里，对在外部作用域（但不是在全局作用域）的变量进行引用，那么内部函数就被认为是闭包
+# 闭包的核心特征是内部函数能够访问外部函数的变量，即使外部函数已经执行完毕
+
+# 闭包是由函数及其相关的引用环境组合而成的实体(即：闭包=函数+引用环境)
+# (想想Erlang的外层函数传入一个参数a, 内层函数依旧传入一个参数b, 内层函数使用a和b, 最后返回内层函数)
+# x()() 通过x调用下一层内部函数
+# 每次调用外部函数后都将生成并保存一个新的局部变量。其实这里外部函数返回的就是闭包
+
+# 1、当闭包执行完后，仍然能够保持住当前的运行环境
+# 2、闭包可以根据外部作用域的局部变量来得到不同的结果
+def funA():
+    x = 888
+    def funB():
+        print(x)
+    return funB
+print(funA())
+# <function funA.<locals>.funB at 0x000001CEAD9B8540>    得到funB的引用
+funA()()
+# 888
+
+# 不直接通过funA调用funB
+funny = funA()
+funny()
+# 888
+
+# 嵌套函数的外层函数作用域  赋值给变量时  能保留
+# 嵌套函数调用，  类似二维数组
+def power(exp):
+    def exp_of(base):
+        return base ** exp
+    return exp_of
+square = power(2)
+cube = power(3)
+print(square(5))
+# 25
+print(cube(5))
+# 125
+print(power(2)(3))
+# 9
+
+def outer():
+    x = 0
+    y = 0
+    def inner(x1, y1):
+        nonlocal x, y
+        x += x1
+        y += y1
+        print(f"现在，x = {x}, y = {y}")
+    return inner
+move = outer()
+move(1, 2)
+# 现在，x = 1, y = 2
+move(-2, 2)
+# 现在，x = -1, y = 4
+
+# 当闭包执行完后，仍然能够保持住当前的运行环境
+# 移动小游戏
+origin = (0, 0)
+legal_x = [-100, 100]
+legal_y = [-100, 100]
+
+def create(pos_x=0, pos_y=0):
+    def moving(direction, step):
+        nonlocal pos_x, pos_y
+        new_x = pos_x + direction[0] * step
+        new_y = pos_y + direction[1] * step
+
+        if new_x < legal_x[0]:
+            pos_x = legal_x[0] - (new_x - legal_x[0])
+        elif new_x > legal_x[1]:
+            pos_x = legal_x[1] - (new_x - legal_x[1])
+        else:
+            pos_x = new_x
+
+        if new_y < legal_y[0]:
+            pos_y = legal_y[0] - (new_y - legal_y[0])
+        elif new_y > origin[1]:
+            pos_y = legal_y[1] - (new_y - legal_y[1])
+        else:
+            pos_y = new_y
+        return pos_x, pos_y
+    return moving
+
+move = create()
+print("向右移动20步后，位置是：", move([1, 0], 20))
+# 向右移动20步后，位置是： (20, 0)
+print("向上移动120步后，位置是：", move([0, 1], 120))
+# 向上移动120步后，位置是： (20, 80)
+print("向右下角移动88步后，位置是：", move([1, -1], 88))
+# 向右下角移动88步后，位置是： (92, -8)
+
+
+
+# ----------------------------------------------------
+def addx(x):
+    def adder(y): return x + y
+    return adder
+c =  addx(8)
+print(type(c))
+# <type 'function'>
+print(c.__name__)
+# adder
+print(c(10))
+# 18
+# ----------------------------------------------------
+
+flist = []
+for i in range(3):
+    def foo(x): print(x + i)
+    flist.append(foo)
+for f in flist:
+    f(2)
+# 4
+# 4
+# 4
+# 先执行完第一个for循环，列表中添加的都是foo(x): print(x + i),此时i = 2 ，执行第二个for循环，结果均为4
+
+flist = []
+for i in range(3):
+    def foo(x, y = i): print(x + y)
+    flist.append(foo)
+for f in flist:
+    f(2)
+# 2
+# 3
+# 4
+# 先执行完第一个for循环，列表中添加的为foo(x): print(x + 0/1/2),，执行第二个for循环，结果为2/3/4
+
+
+def outter():
+    def innerA():
+        x = 100
+
+    def innerB():
+        nonlocal x
+        x = 250
+
+    def innerC():
+        global x
+        x = 520
+
+    x = 880
+
+    innerA()
+    print(f"调用完 innerA() 函数之后，x = {x}")
+
+    innerB()
+    print(f"调用完 innerB() 函数之后，x = {x}")
+
+    innerC()
+    print(f"调用完 innerC() 函数之后，x = {x}")
+outter()
+print(f"此时此刻，全局变量 x = {x}")
+# 调用完 innerA() 函数之后，x = 880
+# 调用完 innerB() 函数之后，x = 250
+# 调用完 innerC() 函数之后，x = 250
+# 此时此刻，全局变量 x = 520
+
+```
+
+
+
+## ==闭包嵌套求平均值 与 返回斐波那契数列==
+
+```python
+# 闭包嵌套求平均值 与 返回斐波那契数列
+def make_avg():
+    x = 0
+    i = 0
+    def inner(y):
+        nonlocal x, i
+        x += y
+        i += 1
+        return x / i
+    return inner
+avg = make_avg()
+print(avg(5))
+# 5.0
+print(avg(3))
+# 4.0
+print(avg(7))
+# 5.0
+print(avg(19))
+# 8.5
+
+# 闭包嵌套返回一个斐波那契数列
+def fib():
+    a, b = 0, 1
+    def inner():
+        nonlocal a, b
+        a, b = b, a + b
+        return b - a
+    return inner
+f = fib()
+print(f(), f(), f(), f(), f(), f(), f(), f(), f())
+# 0 1 1 2 3 4 5 8 13 21
+```
+
+
+
+## 装饰器
+
+```python
+# 装饰器
+# 一种设计模式    在目标函数前添加@函数  将目标函数作为实际参数传入到装饰器函数中
+# 函数可以添加多个装饰器
+# 运行程序一般都是从上到下，添加装饰器后运行到装饰器函数时，添加装饰器函数，然后定位到装饰器，将目标函数传入装饰器函数，再返回装饰器函数，正常往下进行
+
+# ()相当于在调用函数
+def myfunc():
+    print("正在调用myfunc------")
+def report(func):
+    print("开始调用函数")
+    func()
+    print("调用函数结束")
+report(myfunc)
+# 开始调用函数
+# 正在调用myfunc------
+# 调用函数结束
+
+import time
+def time_master(func):
+    print("开始运行程序")
+    start = time.time()
+    func()
+    print("结束运行程序")
+    end = time.time()
+    print(f"一共耗费了{(end - start):.5f}秒")
+def myfunc():
+    time.sleep(2)
+    print("Hello, FishC")
+time_master(myfunc)
+# 开始运行程序
+# Hello, FishC
+# 结束运行程序
+# 一共耗费了2.00034秒
+
+def time_master(func):
+    print("开始运行程序")
+    start = time.time()
+    func()
+    print("结束运行程序")
+    end = time.time()
+    print(f"一共耗费了{(end - start):.5f}秒")
+
+def myfunc():
+    time.sleep(2)
+    print("Hello, FishC")
+time_master(myfunc)
+# 开始运行程序
+# Hello, FishC
+# 结束运行程序
+# 一共耗费了2.00036秒
+
+def time_master(func):
+    def call_func():
+        print("开始运行程序")
+        start = time.time()
+        func()
+        print("结束运行程序")
+        end = time.time()
+        print(f"一共耗费了{(end - start):.5f}秒")
+    return call_func
+
+# 装饰器 将函数作为实际参数传入到装饰器函数中
+# 相当于myfunc = time_master(myfunc)  此时返回call_func  后面再myfunc()来屌用
+@time_master
+def myfunc():
+    time.sleep(2)
+    print("Hello, FishC")
+myfunc()
+# 开始运行程序
+# Hello, FishC
+# 结束运行程序
+# 一共耗费了2.00040秒
+
+# 函数可以添加多个装饰器
+def add(func):
+    def inner():
+        x = func()
+        return x + 1
+    return inner
+def cube(func):
+    def inner():
+        x = func()
+        return x * x * x
+    return inner
+def square(func):
+    def inner():
+        x = func()
+        return x * x
+    return inner
+@add
+@cube
+@square
+def test():
+    return 2
+print(test())
+# 65   add(cube(square(test)))
+
+# 给装饰器传递参数
+def logger(msg):
+    def time_master(func):
+        def call_func():
+            print("开始运行程序")
+            start = time.time()
+            func()
+            print("结束运行程序")
+            end = time.time()
+            print(f"{msg}一共耗费了{(end - start):.5f}秒")
+        return call_func
+    return time_master
+# 相当于funA() = logger(msg="A")(func)
+@logger(msg="A")
+def funA():
+    time.sleep(1)
+    print("正在调用函数A")
+@logger(msg="B")
+def funB():
+    time.sleep(1)
+    print("正在调用函数B")
+funA()
+# 开始运行程序
+# 正在调用函数A
+# 结束运行程序
+# A一共耗费了1.00018秒
+funB()
+# 开始运行程序
+# 正在调用函数B
+# 结束运行程序
+# B一共耗费了1.00064秒
+
+# 目标函数需要参数时
+def my_decorator(func):
+    def wrapper(*args, **kwargs):
+        print("在原函数之前执行")
+        func(*args, **kwargs)
+        print("在原函数之后执行")
+    return wrapper
+
+@my_decorator
+def greet(name):
+    print(f"Hello, {name}!")
+
+greet("Alice")
+# 在原函数之前执行
+# Hello, Alice!
+# 在原函数之后执行
+
+```
+
+
+
+## 装饰器函数的创建与参数
+
+```python
+# 装饰器函数的创建与参数
+import time
+
+# 添加装饰器函数
+def delay(func):
+    def sleep_func():
+        time.sleep(1)
+        func()
+    return sleep_func
+
+def fib():
+    back1, back2 = 0, 1
+    # 添加装饰器
+    @delay
+    def func():
+        nonlocal back1, back2
+        back1, back2 = back2, back1 + back2
+        print(back1, end=' ')
+
+    return func
+
+def get_fib(n):
+    f = fib()
+    for i in range(n):
+        f()
+
+n = int(input("请输入需要获取的斐波那契数："))
+get_fib(n)
+print()
+# 题目要求：
+# 请在此处补充装饰器 type_check() 的代码
+def type_check(correct_type):
+    def type_func(func):
+        def inner(*args):
+            if type(*args) == correct_type:
+                return func(*args)
+            else:
+                return "参数类型错误！"
+        return inner
+    return type_func
+
+
+print("<<<--- 测试整数 --->>>")
+
+@type_check(int)
+def double(x):
+    return x * 2
+
+print(double(2))      # 这里打印结果应该是 4
+print(double("2"))    # 这里打印结果应该是 “参数类型错误”
+
+
+print("\n<<<--- 测试字符串 --->>>")
+
+@type_check(str)
+def upper(s):
+    return s.upper()
+
+print(upper('I love FishC.'))   # 这里打印结果应该是 I LOVE FISHC
+print(upper(250))               # 这里打印结果应该是 “参数类型错误”
+
+```
+
+
 
