@@ -219,7 +219,7 @@ print(0 and not 1 or not 2 and 3 or 4 and not 5)
 
 
 
-## 抛硬币实验
+### 抛硬币实验
 
 ```python
 # 模拟抛200次硬币
@@ -257,7 +257,7 @@ while i < counts:
 
 
 
-## 偶数和
+### 偶数和
 
 ```python
 # 计算 1000000 以内所有偶数的和
@@ -275,7 +275,7 @@ print(s, "以内的所有偶数的和是", sum)
 
 
 
-## 国王棋盘麦子
+### 国王棋盘麦子
 
 ```python
 # 相传国际象棋是古印度舍罕王的宰相达依尔发明的。
@@ -301,7 +301,7 @@ print("舍罕王应该给达依尔", s, "粒麦子！")
 
 
 
-## 阶梯步数
+### 阶梯步数
 
 ```python
 # 有一个长阶梯，若每步上 2 阶，最后剩 1 阶；若每步上 3 阶，最后剩 2 阶；若每步上 5 阶，最后剩 4 阶；若每步上 6 阶，最后剩 5 阶；只有每步上 7 阶，最后刚好一阶也不剩。
@@ -414,7 +414,7 @@ print(level)
 
 
 
-## 角谷猜想
+### 角谷猜想
 
 ```pytyhon
 # 验证角谷猜想
@@ -444,7 +444,7 @@ while n > 0:
 
 
 
-## 抛硬币进阶版
+### 抛硬币进阶版
 
 ```python
 # 抛硬币实验
@@ -563,7 +563,7 @@ else:
 
 
 
-## 九九乘法表
+### 九九乘法表
 
 ```python
 # 九九乘法表
@@ -630,7 +630,7 @@ for n in range(2, 10):
 
 
 
-## ==水仙花数==
+### ==水仙花数==
 
 ```python
 # 水仙花数
@@ -663,7 +663,7 @@ for i in range(100, 1000):
 
 
 
-## ==回文数==
+==回文数==
 
 ```python
 # 判断一个整数是否为回文数
@@ -731,7 +731,7 @@ print([5, "上", 4, "山", 3, "打", 2, "老", 1, "虎"][-2::-2])
 
 
 
-## 两数之和
+### 两数之和
 
 ```python
 # 两数之和
@@ -911,9 +911,7 @@ print(s)
 
 
 
-## ==合法字符串==
-
-
+### ==合法字符串==
 
 ```python
 # 合法字符串
@@ -940,7 +938,7 @@ else:
 
 
 
-## 主要元素
+### 主要元素
 
 ```python
 # 主要元素
@@ -1198,7 +1196,7 @@ print(list4)
 
 
 
-## ==二维列表两个小练习==
+### ==二维列表两个小练习==
 
 ```python
 # 创建一个 88 x 88 的随机整数矩阵（二维列表），然后匹配用户输入的整数是否与其中某元素相等，如果相等则打印其行号和列号。
@@ -1376,7 +1374,7 @@ print(d)
 
 
 
-## ==杨辉三角形==
+### ==杨辉三角形==
 
 ==去掉[]和， :列表转字符串，并以空格连接起来==
     ==tri1 = " ".join(str(j) for j in i)==
@@ -1436,7 +1434,7 @@ for i in tri:
 
 
 
-## ==顺时针输出==
+==顺时针输出==
 
 ```python
 # 顺时针输出
@@ -1591,7 +1589,7 @@ print(w)
 
 
 
-## 创建元组、列表时间
+### 创建元组、列表时间
 
 ```python
 # 创建元组、列表时间
@@ -1678,7 +1676,7 @@ print(pr)
 
 
 
-## ==整理字符串与ASCII转换==
+### ==整理字符串与ASCII转换==
 
 ==ord 将字母转换成ASCII， chr 将ASCII转换成字母==
 
@@ -1811,7 +1809,7 @@ print(x.rindex("来水来"))
 
 
 
-## 版本号比较与加密（规则替换）
+### 版本号比较与加密（规则替换）
 
 ```python
 # 版本号比较与加密（规则替换）
@@ -1970,7 +1968,7 @@ print(keyword.iskeyword("if"))
 
 
 
-## 字符串判断Demo
+### 字符串判断Demo
 
 ```python
 # 给定一个字符串 text 和字符串列表 words，返回 words 中每个单词在 text 中的位置（要求最终的位置从小到大进行排序）。
@@ -2101,7 +2099,7 @@ print(",\n".join("FishC"))
 
 
 
-## ==位移加密与同行字符串==
+### ==位移加密与同行字符串==
 
 ```python
 # 位移加密（凯撒密码）  同行键盘字符串
@@ -2328,7 +2326,7 @@ print(f"{3.1415:{fill}{align}{width}.{prec}{type}}")
 
 
 
-## 格式化练习
+### 格式化练习
 
 ```python
 # 格式化练习
@@ -2383,7 +2381,7 @@ else:
 
 
 
-## 压缩与解压
+### 压缩与解压
 
 ```python
 # 压缩与解压
@@ -2593,7 +2591,7 @@ print([i for i in "FishC" if i.islower()])
 
 
 
-## ==判断子序列与 查找最大奇数==
+### ==判断子序列与 查找最大奇数==
 
 ```python
 # 判断子序列与 查找最大奇数
@@ -2645,7 +2643,7 @@ else:
 
 
 
-## 奇偶排序 翻转单词顺序
+### 奇偶排序 翻转单词顺序
 
 ```python
 # 奇偶排序 翻转单词顺序
@@ -2680,7 +2678,7 @@ print(strings2)
 
 
 
-## 密室打卡（打点计时器 zip)
+### 密室打卡（打点计时器 zip)
 
 ```python
 # 密室打卡（打点计时器 zip)
@@ -2905,7 +2903,7 @@ print(d)
 
 
 
-## 摩斯密码
+### 摩斯密码
 
 ```python
 # 摩斯密码
@@ -2944,7 +2942,7 @@ print(result)
 
 
 
-## ==存查电影数据与电话簿==
+==存查电影数据与电话簿==
 
 ```python
 # 存查电影数据
@@ -3053,7 +3051,7 @@ while True:
 
 
 
-## ==MD5单向加密==
+### ==MD5单向加密==
 
 ```python
 # MD5单向加密
@@ -3164,7 +3162,7 @@ print(x ^ set("Fishc"))
 
 
 
-## ==可变集合的增删查改==
+### ==可变集合的增删查改==
 
 ```python
 # 可变集合的增删查改
@@ -3255,7 +3253,7 @@ print(s1 == s2)
 
 
 
-## 集合的哈希表效率提升
+### 集合的哈希表效率提升
 
 ```python
 import random
@@ -3285,7 +3283,7 @@ print(f"查找过程一共消耗{t}秒。")
 
 
 
-## 破解 MD5 哈希加密
+### 破解 MD5 哈希加密
 
 ```python
 # 利用 dict() 来实现交集和并集  破解 MD5 哈希加密
@@ -3413,7 +3411,7 @@ print(myfunc())
 
 
 
-## 注册与登录模块
+### 注册与登录模块
 
 ```python
 # 注册与登录模块
@@ -3537,7 +3535,7 @@ abc(a=1, b=2, c=3)
 
 
 
-## ==回文字符串拼音版 与 模拟栈==
+### ==回文字符串拼音版 与 模拟栈==
 
 ```python
 # 回文字符串拼音版
@@ -3699,7 +3697,7 @@ myfunc(**kwargs)
 
 
 
-## ==罗马数字与数字的互转==
+### ==罗马数字与数字的互转==
 
 ```python
 # 罗马数字与数字的互转
@@ -3845,7 +3843,7 @@ print(x)
 
 
 
-## ==洗牌算法 —— Fisher-Yates 与斗地主==
+### ==洗牌算法 —— Fisher-Yates 与斗地主==
 
 ```python
 # 洗牌算法 —— Fisher-Yates 与斗地主
@@ -4090,7 +4088,7 @@ print(f"此时此刻，全局变量 x = {x}")
 
 
 
-## ==闭包嵌套求平均值 与 返回斐波那契数列==
+### ==闭包嵌套求平均值 与 返回斐波那契数列==
 
 ```python
 # 闭包嵌套求平均值 与 返回斐波那契数列
@@ -4281,7 +4279,7 @@ greet("Alice")
 
 
 
-## 装饰器函数的创建与参数
+### ==装饰器函数的创建与参数==
 
 ```python
 # 装饰器函数的创建与参数
@@ -4344,6 +4342,992 @@ def upper(s):
 
 print(upper('I love FishC.'))   # 这里打印结果应该是 I LOVE FISHC
 print(upper(250))               # 这里打印结果应该是 “参数类型错误”
+
+```
+
+
+
+## ==lambda表达式==
+
+```python
+# lambda 表达式（匿名函数）
+# lambda arg1, arg2, ... argN : expression
+# 可以存在于函数无法存在的地方，如列表，但不建议这么写
+def squarex(x):
+    return x * x
+
+print(squarex(3))
+# 9
+
+squareY = lambda y : y * y
+print(squareY(3))
+# 9
+
+# 可以存在于 整个函数的定义过程  无法存在的地方，如列表
+y = [lambda x : x * x, 2, 3]
+print(y[0](y[1]))
+# 4
+
+mapped = map(lambda x : ord(x) + 10, "FishC")
+print(list(mapped))
+# [80, 115, 125, 114, 77]
+
+def boring(x):
+    return ord(x) + 10
+print(list(map(boring, "FishC")))
+# [80, 115, 125, 114, 77]
+
+print(list(filter(lambda x : x % 2, range(10))))
+# [1, 3, 5, 7, 9]
+
+
+# ——————————————————————————————————————————————————————
+# 闭包转换成 lambda 表达式
+def power(exp):
+    def exp_of(base):
+        return base ** exp
+    return exp_of
+square = power(2)
+square(2)
+# 4
+# 转换成lambda表达式
+f = lambda exp : lambda base : base ** exp
+square = f(2)
+square(2)
+# 4
+
+# 装饰器转换成 lambda 表达式
+def add(func):
+    def inner():
+        x = func()
+        return x + 1
+    return inner
+@add
+def test():
+    return 2
+print(test())
+# 3
+# 转换成lambda表达式
+@lambda func : lambda : func() + 1
+def test1():
+    return 2
+print(test1())
+# 3
+# ———————————————————————————————————————————————————————
+
+```
+
+
+
+### ==lambda 表达式练习==
+
+```python
+# lambda 表达式练习
+power = {"吕布": 999, "关羽": 888, "刘备": 666, "张飞": 900, "赵云": 789, "不二如是": 999}
+
+# 请 lambda 表达式和 filter() 函数配合，替换下面的代码
+# greater = []
+# for k, v in power.items():
+#     if v > 800:
+#         greater.append((k, v))
+# 请 lambda 表达式和 filter() 函数配合，替换下面的代码
+# ———————————————————————————————————————————————————————————————————————————————————
+greater = list(filter(lambda x : x[1] > 800, power.items()))
+# ———————————————————————————————————————————————————————————————————————————————————
+
+print(greater)
+# [('吕布', 999), ('关羽', 888), ('张飞', 900), ('不二如是', 999)]
+
+
+# 字典获取值
+# dict.get(key, default=None)
+# 返回指定键的值，如果键不在字典中返回 default 设置的默认值
+members = {
+    "鱼C工作室" : {"小甲鱼":83, "不二如是":89, "二师兄":64, "小师妹":75, "鱼小二":96},
+    "复仇者联盟" : {"钢铁侠":85, "绿巨人":39, "黑寡妇":82, "鹰眼":73, "雷神":99},
+    "奥特曼家族" : {"迪迦":99, "艾斯":84, "泰罗":63, "佐菲":78, "赛文":78}}
+
+# 请在此处添加一行代码，完成题目要求，并将结果保存在变量 x 中
+# ———————————————————————————————————————————————————————————————————————————————————
+x = [':'.join((i, min(members[i].items(), key = lambda x:x[1])[0])) for i in members]
+# ———————————————————————————————————————————————————————————————————————————————————
+# for i in members:
+#     i, min(members[i].items(), key = lambda x:x[1])[0]
+
+print(x)
+# ['鱼C工作室:二师兄', '复仇者联盟:绿巨人', '奥特曼家族:泰罗']
+
+```
+
+
+
+## 生成器
+
+```python
+# 生成器
+# yield 代替return， 拥有yield的函数被成为生成器，它是一种特殊的迭代器，支持next函数
+# 生成器对象无法使用下标索引
+# 每次调用yield 只会提供一个数据，并记住当时的状态
+def counter():
+    i = 0
+    while i <= 5:
+        yield i
+        i += 1
+        print("yes")
+print(counter())
+# <generator object counter at 0x000002F571FA5A80>
+for i in counter():
+    print(i)
+# 0
+# yes
+# 1
+# yes
+# 2
+# yes
+# 3
+# yes
+# 4
+# yes
+# 5
+# yes
+
+print("________________________________-")
+c = counter()
+print(next(c))
+print("____")
+print(next(c))
+print("____")
+print(next(c))
+# 0
+# ____
+# yes
+# 1
+# ____
+# yes
+# 2
+
+
+# 斐波那契数列
+def fib():
+    back1, back2 = 0, 1
+    while True:
+        yield back1
+        back1, back2 = back2, back1 + back2
+f = fib()
+print(next(f))
+print(next(f))
+print(next(f))
+print(next(f))
+print(next(f))
+# 0
+# 1
+# 1
+# 2
+# 3
+
+# 生成器表达式（元组推导式）  与列表不同的是列表推导式会一次性生成出来，生成器表达式需要一次次调用
+print((i ** 2 for i in range(10)))
+# <generator object <genexpr> at 0x0000015BB9DFAB50>
+t = ((i ** 2) for i in range(10))
+print(next(t))
+print(next(t))
+print(next(t))
+# 0
+# 1
+# 4
+
+# 生成器会记住当时的状态，所以后面会接着上次的生成
+for i in t:
+    print(i)
+# 9
+# 16
+# 25
+# 36
+# 49
+# 64
+# 81
+
+print(list(map(abs, (-1, 2, -3, 4, -5))))
+# [1, 2, 3, 4, 5]
+# 转换成生成器表达式
+print(list((abs(x) for x in (-1, 2, -3, 4, -5))))
+# [1, 2, 3, 4, 5]
+
+```
+
+
+
+### ==利用生成器定义一个支持浮点数的 frange() 函数==
+
+```python
+# 利用生成器定义一个支持浮点数的 frange() 函数，其功能与 range() 函数相仿。
+# round(number, ndigits=None)    ndigits 指定精度
+# round() 函数用于返回一个指定精度（四舍五入）的结果。
+def frange(start, stop=None, step=0.1):
+    s = str(step)
+    len1 = len(s) - 2
+    start += 0.0
+    if stop is None:
+        stop = start + 0.0
+        start = 0.0
+    while start < stop:
+        yield round(start, len1)
+        start += step
+
+for i in frange(1):
+    print(i)
+
+for i in frange(1, 2):
+    print(i)
+
+for i in frange(5, 10, 0.5):
+    print(i)
+
+```
+
+
+
+## 递归
+
+```python
+# 递归
+# 函数调用自身， 必须有一个结束条件
+def func(i):
+    if i > 0:
+        print("qwer")
+        i -= 1
+        func(i)
+func(4)
+# qwer
+# qwer
+# qwer
+# qwer
+
+# ————————————————————————————————————————————
+# 例子：阶乘
+def factIter(n):
+    value = 1
+    for i in range(1, n + 1):
+        value *= i
+    return value
+print(factIter(4))
+# 24
+
+def factRecur(n):
+    if n == 1:
+        return 1
+    return factRecur(n - 1) * n
+print(factRecur(4))
+# 24
+
+# ————————————————————————————————————————————
+# 例子：斐波那契数列
+def fibIter(n):
+    a = 1
+    b = 1
+    c = 1
+    while n > 2:
+        c = a + b
+        a, b = b, c
+        n = n - 1
+    return c
+print(fibIter(12))
+# 144
+
+def fibRecur(n):
+    if n == 1 or n == 2:
+        return 1
+    return fibRecur(n - 1) + fibRecur(n - 2)
+print(fibRecur(12))
+# 144
+# 时间优化
+def fibRecur_new(n, a, b):
+    if n == 1 or n == 2:
+        return b
+    return fibRecur_new(n - 1, b, a + b)
+print(fibRecur_new(12, 1, 1))
+# 144
+import timeit
+# 这个耗时会比较久（因为默认是重复测试 5 次），请大家耐心等待
+FR = timeit.timeit("fibRecur(12)", setup="from __main__ import fibRecur")
+print(f"普通递归耗时：{FR:.2f}秒。")
+# 普通递归耗时：10.17秒。
+TFR = timeit.timeit("fibRecur_new(12, 1, 1)", setup="from __main__ import fibRecur_new")
+print(f"优化递归耗时：{TFR:.2f}秒。")
+# 优化递归耗时：0.46秒。
+FI = timeit.timeit("fibIter(12)", setup="from __main__ import fibIter")
+print(f"普通迭代耗时：{FI:.2f}秒。")
+# 普通迭代耗时：0.30秒。
+
+# ————————————————————————————————————————————
+# 例子：汉诺塔
+# 一次只能移动一个圆盘，小的圆盘只能在大的圆盘上面
+def hanoi(n):
+    if n == 1:
+        return 1
+    return hanoi(n - 1) * 2 + hanoi(1)
+print(hanoi(5))
+# 31
+def hanoi_fact(n, x, y, z):
+    if n == 1:
+        print(x, "-->", z)
+    else:
+        hanoi_fact(n - 1, x, z, y)
+#         将x的 n - 1 个圆盘移动到y
+        print(x, "-->", z)
+        hanoi_fact(n - 1, y, x, z)
+#         将y的 n - 1 个圆盘移动到z
+hanoi_fact(5,"A","B","C")
+# A --> C
+# A --> B
+# C --> B
+# A --> C
+# B --> A
+# B --> C
+# A --> C
+# A --> B
+# C --> B
+# C --> A
+# B --> A
+# C --> B
+# A --> C
+# A --> B
+# C --> B
+# A --> C
+# B --> A
+# B --> C
+# A --> C
+# B --> A
+# C --> B
+# C --> A
+# B --> A
+# B --> C
+# A --> C
+# A --> B
+# C --> B
+# A --> C
+# B --> A
+# B --> C
+# A --> C
+
+```
+
+
+
+### 递归函数练习
+
+```python
+# 递归函数练习
+# 计算从 1 + 2 + 3 + ... + n 的结果
+def get_sum(n):
+    if n == 1:
+        return 1
+    return n + get_sum(n - 1)
+
+
+# 判断该整数是否为 2 的幂次方。如果是返回 True，否则返回 False
+def isPowerOfTwo(n):
+    if n == 0:
+        return False
+    elif str(n).isdigit():
+        if n == 1:
+            return True
+        elif n % 2 != 0:
+            return False
+        else:
+            return isPowerOfTwo(n // 2)
+    else:
+        return False
+
+
+# 只使用加号运算符（+）来实现乘法运算的结果
+def mul(x,y):
+    if y == 0 or x == 0:
+        return 0
+    if y == 1:
+        return x
+    if x == 1:
+        return y
+    if x < y:
+        return mul(x-1, y) + y
+    else:
+        return mul(x, y-1) + x
+
+
+# 找到列表中最大的元素
+def get_max(L):
+    max = L[0]
+    if not L:
+        return None
+    if len(L) == 1:
+        return max
+    if L[1] > max:
+        return get_max(L[1:])
+    else:
+        L.pop(1)
+        return get_max(L)
+# 小甲鱼版
+def get_max(L):
+    if len(L) == 2:
+        return L[0] if L[0] > L[1] else L[1]
+    else:
+        sub = get_max(L[1:])
+        return L[0] if L[0] > sub else sub
+
+# 假设僧侣每秒钟都能正确地移动一枚金片，请问将 64 枚金片从一根银针移动到另外一根银针上，大概需要使用多少时间？
+def hanoi(n):
+    if n == 1:
+        return 1
+    return hanoi(n - 1) * 2 + hanoi(1)
+
+```
+
+
+
+## ==函数文档、类型注释、内省==
+
+```python
+# 函数文档、类型注释、内省
+# help 查看函数文档
+help(print)
+# Help on built-in function print in module builtins:
+#
+# print(*args, sep=' ', end='\n', file=None, flush=False)
+#     Prints the values to a stream, or to sys.stdout by default.
+#
+#     sep
+#       string inserted between values, default a space.
+#     end
+#       string appended after the last value, default a newline.
+#     file
+#       a file-like object (stream); defaults to the current sys.stdout.
+#     flush
+#       whether to forcibly flush the stream.
+
+def exchange(dollar, rate=7.18):
+    """
+    功能：汇率转换，美元 -> 人名币
+    参数：
+    - dollar 美元数量
+    - rate 汇率，默认值是7.18(2025-05-29
+    返回值：
+    - 人民币的数量
+    """
+    return dollar * rate
+help(exchange)
+# Help on function exchange in module __main__:
+#
+# exchange(dollar, rate=7.18)
+#     功能：汇率转换，美元 -> 人名币
+#     参数：
+#     - dollar 美元数量
+#     - rate 汇率，默认值是7.18(2025-05-29
+#     返回值：
+#     - 人民币的数量
+
+# ————————————————————————————————————————————————————————————
+# 类型注释
+# 告知希望传入参数类型及返回值
+def times(s:str, n:int) ->str:
+    return s * n
+print(times(5,5))
+# 25
+
+def times(s:str = "FishC", n:int = 3) ->str:
+    return s * n
+print(times())
+# FishCFishCFishC
+
+# 希望是列表
+def times(s:list, n:int = 3) ->list:
+    return s * n
+print(times([1, 2, 3]))
+# [1, 2, 3, 1, 2, 3, 1, 2, 3]
+
+# 希望是整数列表
+def times(s:list[int], n:int = 3) ->list:
+    return s * n
+
+# 希望是字典
+def times(s:dict[str,int], n:int = 3) ->list:
+    return list(s.keys()) * n
+
+
+# 内省
+print(times.__name__)
+# times
+# annotations 注释
+print(times.__annotations__)
+# {'s': dict[str, int], 'n': <class 'int'>, 'return': <class 'list'>}
+# 查看函数文档
+print(exchange.__doc__)
+# 功能：汇率转换，美元 -> 人名币
+# 参数：
+# - dollar 美元数量
+# - rate 汇率，默认值是7.18(2025-05-29
+# 返回值：
+# - 人民币的数量
+
+```
+
+
+
+### 斗地主打牌版
+
+```python
+# 斗地主打牌版
+import random
+
+def show_cards():
+    all_cards = ["♦3", "♦4", "♦5", "♦6", "♦7", "♦8", "♦9", "♦10", "♦J", "♦Q", "♦K", "♦1", "♦2",
+             "♥3", "♥4", "♥5", "♥6", "♥7", "♥8", "♥9", "♥10", "♥J", "♥Q", "♥K", "♥1", "♥2",
+             "♣3", "♣4", "♣5", "♣6", "♣7", "♣8", "♣9", "♣10", "♣J", "♣Q", "♣K", "♣1", "♣2",
+             "♠3", "♠4", "♠5", "♠6", "♠7", "♠8", "♠9", "♠10", "♠J", "♠Q", "♠K", "♠1", "♠2",
+             "🌙", "☀"]
+    for i in range(len(all_cards)):
+        print(all_cards[i], end=" ")
+        if (i + 1) % 13 == 0 or i == 53:
+            print()
+
+# 洗牌
+# def fy_shuffle(x, n=1):
+#     for i in range(n):
+#         target = list(x)
+#         result = []
+#         while target:
+#             r = random.randint(0, len(target) - 1)  # 步骤2
+#             result.append(target.pop(r))  # 步骤3
+#
+#     return result
+#
+#
+# def dealCards():
+#     a = input("请输入第一位游戏玩家名称：")
+#     b = input("请输入第二位游戏玩家名称：")
+#     c = input("请输入第三位游戏玩家名称：")
+#
+#     r = {}
+#     r[a], r[b], r[c] = [], [], []
+#
+#     new_cards = fy_shuffle(cards, 3)
+#
+#     for i in range(17):
+#         r[a].append(new_cards.pop())
+#         r[b].append(new_cards.pop())
+#         r[c].append(new_cards.pop())
+#
+#     d = random.sample((a, b, c), 1)[0]
+#     print(f"\n地主是：{d}\n")
+#     r[d].extend((new_cards.pop(), new_cards.pop(), new_cards.pop()))
+#
+#     print(f"[{a}]拿到的牌是：{' '.join(r[a])}\n")
+#     print(f"[{b}]拿到的牌是：{' '.join(r[b])}\n")
+#     print(f"[{c}]拿到的牌是：{' '.join(r[c])}")
+#
+#
+# dealCards()
+
+# 一对
+def is_pair(cards):
+    if len(cards) == 2 and cards[0] == cards[1]:
+        return True
+    else:
+        return False
+
+# 火箭
+def is_rocket(cards):
+    if len(cards) == 2 and 14 in cards and 15 in cards:
+        return True
+    else:
+        return False
+
+# 三张
+def is_three(cards):
+    if len(cards) == 3 and cards[0] == cards[1] == cards[2]:
+        return True
+    else:
+        return False
+
+# 炸弹
+def is_four(cards):
+    if len(cards) == 4 and cards[0] == cards[1] == cards[2] == cards[3]:
+        return True
+    else:
+        return False
+
+def get_input():
+    input_card = input("请出牌（出牌间隔，退出请输入Q）：")
+    if input_card == "Q":
+        return 0
+    else:
+        input_card = input_card.split()
+        return input_card
+
+def change_input(cards):
+    result = []
+    target = {"3":1, "4":2, "5":3, "6":4, "7":5, "8":6, "9":7, "10":8, "J":9, "Q":10, "K":11, "1":12, "2":13}
+    for each in cards:
+        num = target.get(each[1:])
+        if num:
+            result.append(num)
+        else:
+            result.append(14 if each == "🌙" else 15)
+    return result
+
+
+def check_cards(cards):
+    if is_pair(cards):
+        print("符合规则：对牌")
+    elif is_rocket(cards):
+        print("符合规则：火箭")
+    elif is_three(cards):
+        print("符合规则：三张牌相同")
+    elif is_four(cards):
+        print("符合规则：炸弹")
+    else:
+        print("不符合规则!")
+
+
+def play_cards():
+    show_cards()
+    cards = get_input()
+    while cards:
+        cards = change_input(cards)
+        check_cards(cards)
+        cards = get_input()
+play_cards()
+
+```
+
+
+
+## ==高阶函数==
+
+```python
+# 高阶函数
+# 一个调用其他函数作为参数时，这个函数被称为高阶函数
+# functools 包括许多高阶函数的模块
+# reduce, 将可迭代的元素依次放入函数中, 依次进行，前一次计算的结果会作为前一次的参数传入
+import functools
+def add(x, y):
+    return x + y
+print(functools.reduce(add, [1, 2, 3, 4, 5]))    # 15
+print(add(add(add(add(1,2),3),4),5))    # 15
+
+# 阶乘
+print(functools.reduce(lambda x, y: x*y, range(1, 11)))    # 3628800
+
+
+# 偏函数
+# partial 对指定的函数进行二次包装，将所需参数预先绑定一部分，剩下的才是需要输入的
+square = functools.partial(pow, 2)
+print(square(3))    # 9
+cube = functools.partial(pow, 3)
+print(cube(3))    # 27
+
+
+# @wraps装饰器
+# 可以使得被装饰函数在查询 __name__ 时查到自己的函数名
+import time
+def time_master(func):
+    def call_func():
+        print("开始运行程序")
+        start = time.time()
+        func()
+        print("结束运行程序")
+        end = time.time()
+        print(f"一共耗费了{(end - start):.5f}秒")
+    return call_func
+
+@time_master
+def myfunc():
+    time.sleep(2)
+    print("Hello, FishC")
+# myfunc()
+print(myfunc.__name__)
+# call_func
+
+def time_master(func):
+    @functools.wraps(func)
+    def call_func():
+        print("开始运行程序")
+        start = time.time()
+        func()
+        print("结束运行程序")
+        end = time.time()
+        print(f"一共耗费了{(end - start):.5f}秒")
+    return call_func
+
+@time_master
+def myfunc():
+    time.sleep(2)
+    print("Hello, FishC")
+# myfunc()
+print(myfunc.__name__)
+# myfunc
+
+```
+
+
+
+### ==斗地主打牌进阶版==
+
+```python
+# 斗地主打牌进阶版
+import random
+
+def show_cards():
+    all_cards = ["♦3", "♦4", "♦5", "♦6", "♦7", "♦8", "♦9", "♦10", "♦J", "♦Q", "♦K", "♦1", "♦2",
+             "♥3", "♥4", "♥5", "♥6", "♥7", "♥8", "♥9", "♥10", "♥J", "♥Q", "♥K", "♥1", "♥2",
+             "♣3", "♣4", "♣5", "♣6", "♣7", "♣8", "♣9", "♣10", "♣J", "♣Q", "♣K", "♣1", "♣2",
+             "♠3", "♠4", "♠5", "♠6", "♠7", "♠8", "♠9", "♠10", "♠J", "♠Q", "♠K", "♠1", "♠2",
+             "🌙", "☀"]
+    for i in range(len(all_cards)):
+        print(all_cards[i], end=" ")
+        if (i + 1) % 13 == 0 or i == 53:
+            print()
+
+# 洗牌
+# def fy_shuffle(x, n=1):
+#     for i in range(n):
+#         target = list(x)
+#         result = []
+#         while target:
+#             r = random.randint(0, len(target) - 1)  # 步骤2
+#             result.append(target.pop(r))  # 步骤3
+#
+#     return result
+#
+#
+# def dealCards():
+#     a = input("请输入第一位游戏玩家名称：")
+#     b = input("请输入第二位游戏玩家名称：")
+#     c = input("请输入第三位游戏玩家名称：")
+#
+#     r = {}
+#     r[a], r[b], r[c] = [], [], []
+#
+#     new_cards = fy_shuffle(cards, 3)
+#
+#     for i in range(17):
+#         r[a].append(new_cards.pop())
+#         r[b].append(new_cards.pop())
+#         r[c].append(new_cards.pop())
+#
+#     d = random.sample((a, b, c), 1)[0]
+#     print(f"\n地主是：{d}\n")
+#     r[d].extend((new_cards.pop(), new_cards.pop(), new_cards.pop()))
+#
+#     print(f"[{a}]拿到的牌是：{' '.join(r[a])}\n")
+#     print(f"[{b}]拿到的牌是：{' '.join(r[b])}\n")
+#     print(f"[{c}]拿到的牌是：{' '.join(r[c])}")
+#
+#
+# dealCards()
+
+# 一对
+def is_pair(cards):
+    # 用集合判断是否都是同一个数字
+    if len(cards) == 2 and len(set(cards)) == 1:
+        return True
+    else:
+        return False
+
+# 火箭
+def is_rocket(cards):
+    if len(cards) == 2 and 14 in cards and 15 in cards:
+        return True
+    else:
+        return False
+
+# 三张
+def is_three(cards):
+    if len(cards) == 3 and len(set(cards)) == 1:
+        return True
+    else:
+        return False
+
+# 炸弹
+def is_four(cards):
+    if len(cards) == 4 and len(set(cards)) == 1:
+        return True
+    else:
+        return False
+
+# 三带一
+def is_three_one(cards):
+    if len(cards) == 4:
+        for each in cards:
+            # 检查给定的牌列表中是否存在一张牌出现了三次
+            if cards.count(each) == 3:
+                return True
+    return False
+
+# 三带二
+def is_three_two(cards):
+    if len(cards) == 5:
+        for each in cards:
+            # 检查给定的牌列表中是否存在一张牌出现了三次
+            if cards.count(each) == 3 and len(set(cards)) == 2:
+                return True
+    return False
+
+# 四带二
+def is_four_two(cards):
+    if len(cards) == 6:
+        for each in cards:
+            # 检查给定的牌列表中是否存在一张牌出现了四次
+            if cards.count(each) == 4 and len(set(cards)) == 2:
+                return True
+    return False
+
+# 单顺
+def is_continue(cards):
+    if 2 in cards or 14 in cards or 15 in cards:
+        return False
+    # 排序
+    cards.sort()
+    # 判断是否是顺子
+    for i in range(len(cards) - 1):
+        if cards[i] + 1 != cards[i + 1]:
+            return False
+    return True
+
+# 双顺
+def is_con_pair(cards):
+    if len(cards) % 2 != 0:
+        return False
+    if 2 in cards or 14 in cards or 15 in cards or len(set(cards)) != len(cards) // 2:
+        return False
+    cards.sort()
+    # 判断是否两两成对
+    for i in range(0, len(cards) - 1, 2):
+        if cards[i] != cards[i + 1]:
+            return False
+    # 最后判断是否为顺子
+    return is_con_pair(cards[::2])
+
+# 三顺
+def is_con_three(cards):
+    if len(cards) % 3 != 0:
+        return False
+    if 2 in cards or 14 in cards or 15 in cards or len(set(cards)) != len(cards) // 2:
+        return False
+    cards.sort()
+    for i in range(0, len(cards) - 2, 3):
+        if cards[i] != cards[i + 1] or cards[i] != cards[i + 2] or cards[i + 1] != cards[i + 2]:
+            return False
+    # 最后判断是否为顺子
+    return is_con_pair(cards[::3])
+
+# 飞机带翅膀
+def is_airplane_wing(cards):
+    t1 = []
+    t2 = []
+    for each in cards:
+        if cards.count(each) == 3:
+            t1.append(each)
+        else:
+            t2.append(each)
+    if is_con_three(t1) and len(set(t1)) == len(set(t2)):
+        return True
+    else:
+        return False
+
+def get_input():
+    input_card = input("请出牌（出牌间隔，退出请输入Q）：")
+    if input_card == "Q":
+        return 0
+    else:
+        input_card = input_card.split()
+        return input_card
+
+def change_input(cards):
+    result = []
+    target = {"3":1, "4":2, "5":3, "6":4, "7":5, "8":6, "9":7, "10":8, "J":9, "Q":10, "K":11, "1":12, "2":13}
+    for each in cards:
+        num = target.get(each[1:])
+        if num:
+            result.append(num)
+        else:
+            result.append(14 if each == "🌙" else 15)
+    return result
+
+
+def check_cards(cards):
+    if is_pair(cards):
+        print("符合规则：对牌")
+    elif is_rocket(cards):
+        print("符合规则：火箭")
+    elif is_three(cards):
+        print("符合规则：三张牌相同")
+    elif is_four(cards):
+        print("符合规则：炸弹")
+    else:
+        print("不符合规则!")
+
+def check_cards(cards):
+    if len(cards) == 2:
+        if is_pair(cards):
+            print("符合规则：对牌")
+        elif is_rocket(cards):
+            print("符合规则：火箭")
+        else:
+            print("不符合规则!")
+
+    elif len(cards) == 3:
+        if is_three(cards):
+            print("符合规则：三张牌相同")
+        else:
+            print("不符合规则!")
+
+    elif len(cards) == 4:
+        if is_four(cards):
+            print("符合规则：炸弹")
+        elif is_three_one(cards):
+            print("符合规则：三带一")
+        else:
+            print("不符合规则!")
+
+    elif len(cards) >= 5:
+        if is_continue(cards):
+            print("符合规则：顺子")
+        else:
+            if len(cards) == 5:
+                if is_three_two(cards):
+                    print("符合规则：三带二")
+                else:
+                    print("不符合规则!")
+
+            if len(cards) == 6:
+                if is_four_two(cards):
+                    print("符合规则：四带二")
+                elif is_con_pair(cards):
+                    print("符合规则：双顺")
+                elif is_con_three(cards):
+                    print("符合规则：三顺")
+                else:
+                    print("不符合规则!")
+                    
+            if len(cards) == 8:
+                if is_airplane_wing(cards):
+                    print("符合规则：飞机带翅膀")
+                elif is_con_pair(cards):
+                    print("符合规则：双顺")
+                elif is_con_three(cards):
+                    print("符合规则：三顺")
+                else:
+                    print("不符合规则!")
+
+
+def play_cards():
+    show_cards()
+    cards = get_input()
+    while cards:
+        cards = change_input(cards)
+        check_cards(cards)
+        cards = get_input()
+play_cards()
 
 ```
 
