@@ -5333,3 +5333,468 @@ play_cards()
 
 
 
+# 14.文件
+
+## 打开文件
+
+```python
+# 文件永久存储
+# 临时：内存，永久：硬盘
+# open()    打开一个文件并返回其对应的文件对象
+# open(file, mode='r', buffering=-1, encoding=None, errors=None, newline=None, closefd=True, opener=None)
+# r 读取；w 打开文件，若存在则覆盖；a 追加；+ 更新文件（读取和写入）
+# b 二进制；t 文本模式；x 如果文件已存在则创建失败
+# write(text)    将字符串写入并返回字符个数
+# writelines(lines)    可以将多个字符串写入，不会自动换行，无返回值
+# EOF    End Of the File，表示文件末尾的位置
+f = open("FishC.txt", "w")
+print(f.write("Hello, FishC"))
+f.writelines(["Hello, FishC\n", "I love FishC"])
+f.close()    # 关闭并写入， flush 刷新并写入
+
+f = open("FishC.txt", "r+")
+print(f.readable())    #True
+print(f.writable())    #True
+
+for each in f:
+    print(each)
+# Hello, FishCHello, FishC
+#
+# I love FishC
+print(f.read())    # 文件读取会继续读取后面的内容，但此时文件已经读取完毕，故读取内容为空
+# tell()    查询现在读取到了第几个字符
+# seek()    修改文件指针，0 文件起始位置；1 当前位置；2 文件末尾
+print(f.tell())    # 38
+f.seek(0)
+# readline()    每次读取一行
+print(f.readline())    # Hello, FishCHello, FishC
+print(f.read())    # I love FishC
+
+f.write("I love my wife")
+f.flush()
+
+# truncate 将文件对象截取到指定位置
+f.truncate(29)
+f.close()
+
+```
+
+
+
+### 文件截取练习
+
+```python
+# 对FishC.txt，截取其中第 10~15 个字符，并保存为新文件（FishD.txt）
+f1 = open("FishC.txt", "r")
+f2 = open("FishD.txt", "w")
+
+f1.seek(10)
+f2.write(f1.read(5))
+
+f1.close()
+f2.close()
+
+# 对FishC.txt，截取前面 15 个字符，并保存覆盖保存原文件。
+f = open("FishC.txt", "r+")
+f.truncate(15)
+f.close()
+
+# 打开自己的源文件，然后打印出来
+f3 = open("fileDemo_01.py", "r", encoding="utf-8")
+for line in f3:
+    print(line, end="")
+f3.close()
+
+# 图片隐写术   在图片中隐藏文件
+# 将压缩文件的内容，追加写入到图片文件的尾部，更改后缀名为zip或rar即可查看压缩文件(二进制)
+f4 = open("test.jpg", "ab")
+f5 = open("target.zip", "rb")
+
+f4.write(f5.read())
+
+f4.close()
+f5.close()
+
+print("finished")
+
+```
+
+
+
+## 路径处理
+
+```python
+# 路径处理
+# pathlib 模块
+# Path.cwd() 获取当前目录的路径
+# Path() 打开指定路径
+# a / b 拼接路径
+# __file__ 当前脚本的绝对路径
+from os import rename
+from pathlib import Path
+
+print(Path.cwd())   # D:\Program_Repository\github\basic\file
+p = Path(r"D:\Program_Repository\github\basic\file\test")
+print(p)    # D:\Program_Repository\github\basic\file\test
+q = p / "FishC.txt"
+print(q)    # D:\Program_Repository\github\basic\file\test\FishC.txt
+
+
+# is_dir() 路径是否为文件夹    is_file() 路径是否为文件
+# exists() 路径是否存在
+# name 获取路径的最后一个部分
+# stem 获取文件名    suffix 获取文件后缀
+# parent 获取其父级目录
+# parents 获取逻辑祖先路径构成的序列
+# parts 将路径拆分成元组
+# stat() 查看当前状态
+print(p.is_dir(), p.is_file())    # True False
+print(p.exists())    # True
+print(p.name)    # file
+print(q.stem, q.suffix)    # FishC .txt
+print(p.parent)    # D:\Program_Repository\github\basic\file
+
+ps = p.parents
+for each in ps:
+    print(each)
+# D:\Program_Repository\github\basic\file
+# D:\Program_Repository\github\basic
+# D:\Program_Repository\github
+# D:\Program_Repository
+# D:\
+print(ps[0], ps[1])    # D:\Program_Repository\github\basic\file D:\Program_Repository\github\basic
+
+print(p.parts)    # ('D:\\', 'Program_Repository', 'github', 'basic', 'file', 'test')
+print(p.stat())    # os.stat_result(st_mode=16895, st_ino=2533274790466088, st_dev=17911000550101998974, st_nlink=1, st_uid=0, st_gid=0, st_size=0, st_atime=1749058015, st_mtime=1749058009, st_ctime=1749058009)
+
+# stat().st_size 文件或文件夹大小(单位字节)
+print(p.stat().st_size)    # 0
+
+
+# 绝对路径/相对路径
+# . 当前所在目录    .. 上一级目录
+# resolve() 转换成绝对路径
+# iterdir() 获取当前路径下所有的子文件和子文件夹
+print(Path("./FishD.txt"))    # FishD.txt
+print(Path("../assets"))    # ..\assets
+print(Path("./FishD.txt").resolve())    # D:\Program_Repository\github\basic\file\FishD.txt
+m = Path(r"D:\Program_Repository\github\basic\file")
+for i in m.iterdir():
+    print(i)
+# D:\Program_Repository\github\basic\file\file01.py
+# D:\Program_Repository\github\basic\file\file02.py
+# D:\Program_Repository\github\basic\file\fileDemo_01.py
+# D:\Program_Repository\github\basic\file\FishD.txt
+# D:\Program_Repository\github\basic\file\target.zip
+# D:\Program_Repository\github\basic\file\test
+# D:\Program_Repository\github\basic\file\test.jpg
+
+print([i for i in m.iterdir() if i.is_file()])
+# [WindowsPath('D:/Program_Repository/github/basic/file/file01.py'), WindowsPath('D:/Program_Repository/github/basic/file/file02.py'), WindowsPath('D:/Program_Repository/github/basic/file/fileDemo_01.py'), WindowsPath('D:/Program_Repository/github/basic/file/FishD.txt'), WindowsPath('D:/Program_Repository/github/basic/file/target.zip'), WindowsPath('D:/Program_Repository/github/basic/file/test.jpg')]
+
+# 路径修改
+# mkdir() 创建文件夹
+n = p / "FishC"
+# 若文件夹存在会报错,需要设置 exist_ok=True
+n.mkdir(exist_ok=True)
+# 若路径中有多个不存在的文件夹会报错，需要设置 parents=True
+n = p / "FishC/A/B/C"
+n.mkdir(parents=True, exist_ok=True)
+# open() 打开该路径
+n = n / "FishC.txt"
+f = n.open("w")
+f.write("I love FishC")
+f.close()
+
+import os
+# rename() 修改文件或文件夹名字, 无指定路径时默认当前文件夹
+# replace() 替换指定的文件或文件夹，将文件剪切并替换掉
+# rmdir() unlink() 删除文件夹（文件夹非空时会报错）；删除文件
+# glob() 查找    迭代器，需要用list
+# help(os.rename)
+# os.rename(r"D:\Program_Repository\github\basic\file\test\FishC\A\B\C\FishC.txt", r"D:\Program_Repository\github\basic\file\test\FishC\A\B\C\NewFishC.txt")
+m = Path("FishC.txt")
+# m.replace(n) # 无替换文件时会报错
+
+# n.unlink()
+# n.parent.rmdir()
+
+p = Path(".") # 当前目录
+print(p.resolve())
+# D:\Program_Repository\github\basic\file
+p1 = list(p.glob("*.txt"))
+for each in p1:
+    print(each)
+# FishD.txt
+
+p = Path("..") # 上一级目录
+print(p.resolve())
+# D:\Program_Repository\github\basic
+p2 = list(p.glob("file/*.py")) # 下一级目录
+for each in p2:
+    print(each)
+# ..\file\file01.py
+# ..\file\file02.py
+# ..\file\fileDemo_01.py
+
+p = Path(".")
+p3 = list(p.glob("**/*.py")) # 当前目录及下一级目录
+for each in p3:
+    print(each)
+# file01.py
+# file02.py
+# fileDemo_01.py
+p4 = list(p.glob("*/*.py")) # 下一级目录
+print(p4) # []
+
+```
+
+
+
+### 文件路径处理练习
+
+```python
+# 文件处理练习
+# 判断当前路径是否为文件夹类型，如果是则在路径末尾追加一个 FishC.txt
+from pathlib import Path
+
+p = Path(r"D:\临时\test")
+if p.is_dir():
+    n = p / "FishC.txt"
+    print(n.resolve())
+
+
+# ————————————————————————————————————————————————————————
+# 列举出当前目录下的所有子目录
+# 带绝对路径
+p = Path.cwd()
+n = list(p.glob("./*"))
+for i in n:
+    if i.is_dir():
+        print(i)
+        print(i.name)
+# D:\Program_Repository\github\basic\file\test
+# test
+# 不带绝对路径
+p = Path(".")
+n = list(p.glob("./*"))
+for i in n:
+    if i.is_dir():
+        print(i)
+# test
+
+print([x for x in p.iterdir() if x.is_dir()])
+# [WindowsPath('test')]
+
+
+# ————————————————————————————————————————————————————————
+# 列举出当前目录下的所有文件的尺寸
+for i in p.iterdir():
+    print(f"文件名：{i}，文件尺寸：{i.stat().st_size}字节")
+# 文件名：file01.py，文件尺寸：1491字节
+# 文件名：file02.py，文件尺寸：4581字节
+# 文件名：fileDemo_01.py，文件尺寸：813字节
+# 文件名：fileDemo_02.py，文件尺寸：750字节
+# 文件名：FishD.txt，文件尺寸：5字节
+# 文件名：target.zip，文件尺寸：179字节
+# 文件名：test，文件尺寸：0字节
+# 文件名：test.jpg，文件尺寸：71633字节
+
+
+# ————————————————————————————————————————————————————————
+# 列举出当前目录下的所有文件的修改时间
+# time.strftime(format, struct_time) 用于将时间元组或者struct_time对象格式化为字符串
+# time.strptime(string, format) 用于解析字符串为时间元组对象
+# time.localtime() 根据提供的时间戳来转换为本地时间
+from time import strftime,localtime
+for i in n:
+    print(f"文件名：{i}，修改时间：{strftime('%Y-%m-%d %H-%M-%S', localtime(i.stat().st_mtime))}")
+# 文件名：file01.py，修改时间：2025-06-01 17-28-15
+# 文件名：file02.py，修改时间：2025-06-05 01-56-27
+# 文件名：fileDemo_01.py，修改时间：2025-06-01 17-38-15
+# 文件名：fileDemo_02.py，修改时间：2025-06-05 17-22-00
+# 文件名：FishD.txt，修改时间：2025-06-05 01-33-49
+# 文件名：target.zip，修改时间：2025-06-01 17-33-13
+# 文件名：test，修改时间：2025-06-05 01-26-57
+# 文件名：test.jpg，修改时间：2025-06-05 01-33-49
+
+
+# ————————————————————————————————————————————————————————
+# 获取指定路径（文件夹）中所有的文件名，并按文件尺寸按从小到大进行排序
+p = Path("..")
+file = []
+for i in p.iterdir():
+    if i.is_dir():
+        file.append(i)
+
+file.sort(key=lambda x: x.stat().st_size)
+for i in file:
+    print(f"文件名：{i}，尺寸大小：{i.stat().st_size}字节")
+# 文件名：..\assets，尺寸大小：0字节
+# 文件名：..\dictionary，尺寸大小：0字节
+# 文件名：..\FristGame，尺寸大小：0字节
+# 文件名：..\number，尺寸大小：0字节
+# 文件名：..\sequence，尺寸大小：0字节
+# 文件名：..\set，尺寸大小：0字节
+# 文件名：..\tuple，尺寸大小：0字节
+# 文件名：..\Variables_Strings，尺寸大小：0字节
+# 文件名：..\.git，尺寸大小：4096字节
+# 文件名：..\.idea，尺寸大小：4096字节
+# 文件名：..\branch_loop，尺寸大小：4096字节
+# 文件名：..\file，尺寸大小：4096字节
+# 文件名：..\function，尺寸大小：4096字节
+# 文件名：..\list_Demo，尺寸大小：4096字节
+# 文件名：..\strings，尺寸大小：4096字节
+
+# 一行流
+print("\n".join(f"文件名：{i}，尺寸大小：{i.stat().st_size}字节" for i in sorted((j for j in Path("..").iterdir() if j.is_dir()), key=lambda x:x.stat().st_size)))
+
+
+# ————————————————————————————————————————————————————————
+# 找出指定路径（文件夹）中最后被修改的文件
+from time import strftime,localtime
+p = Path("..")
+file = []
+for i in p.iterdir():
+    if i.is_file():
+        file.append(i)
+n = max(file, key=lambda x: x.stat().st_mtime)
+print(f"文件名:{n}，修改时间：{strftime('%Y-%m-%d %H-%M-%S', localtime(n.stat().st_mtime))}")
+# 文件名:..\PythonBasic.md，修改时间：2025-06-01 00-24-04
+
+# 一行流
+# f"{a := b}" 表示a = b
+# max([a, b]) 多个列表时，默认对列表中第一个元素进行比较，但返回的是整个列表，这也意味着后面的元素可以放置想要打印的东西
+print(f"文件名:{(file := max([j for j in Path("..").iterdir() if j.is_file()], key=lambda x:x.stat().st_mtime)).name}，修改时间：{strftime('%Y-%m-%d %H-%M-%S', localtime(file.stat().st_mtime))}")
+# 文件名:PythonBasic.md，修改时间：2025-06-01 00-24-04
+print(max([(strftime("修改时间 -> %Y-%m-%d %H:%M:%S", localtime(f.stat().st_mtime)), f"文件名 -> {f.name}") for f in Path("..").iterdir() if f.is_file()]))
+
+```
+
+
+
+## with 和 pickle模块
+
+```python
+# with 和 pickle模块
+# with语句和上下文管理器(上文打开文件，下文关闭文件)
+f = open("FishC.txt", "w")
+f.write("I love fishc")
+f.close()
+# 用with代替,不需要再关闭文件，即时保存操作，即使后面报错也能正常关闭文件
+with open("FishC.txt", "w") as f:
+    f.write("I love fishc")
+
+
+# pickle模块 永久存储python对象 二进制
+import pickle
+x, y, z = 1, 2, 3
+s = "FishC"
+l = ["小甲鱼", 520, 3.14]
+d = {"one":1, "two":2}
+# 保存到.pkl文件
+with open("data.pkl", "wb") as f:
+    pickle.dump((x, y, z, s, l, d), f)
+
+# 读取.pkl文件
+with open("data.pkl", "rb") as f:
+    x, y, z, s, l, b = pickle.load(f)
+
+print(x, y, z, s, l, b, sep="\n")
+# 1
+# 2
+# 3
+# FishC
+# ['小甲鱼', 520, 3.14]
+# {'one': 1, 'two': 2}
+
+# 使用 with 语句管理两个文件的上下文
+with open("FishC.txt", "r") as f1, open("FishD.txt", "r") as f2:
+    f1.seek(10)
+    f2.write(f1.read(5))
+
+```
+
+
+
+### 文件with练习
+
+```python
+# 文件with练习
+# 在 pathlib 模块中，Path 对象有一个 glob() 方法，它提供了向下递归搜索的能力（如下），请自己编写一个递归函数，实现相同的搜索功能
+from pathlib import Path
+p = Path("..")
+# print(list(p.glob("**/*.txt")), end="\n")
+
+files = []
+def get_file(p, files, target):
+    for each in p.iterdir():
+        if each.is_file() and each.suffix == target:
+            files.append(each)
+        if each.is_dir():
+            p = each
+            get_file(p, files, target)
+    return files
+
+print(get_file(p, files, ".txt"))
+
+# 请下载附件（  target.zip (5.56 KB, 下载次数: 597) ），自动统计该文件夹中的 Python 总代码行数。
+
+# A. 其中包含的子文件夹，也需要一并统计入内
+# B. 空行不能算
+# C. 本题的源代码不统计入内
+# 提示1：可以通过 __file__ 得到包含本源代码文件名的路径（字符串类型）
+# 提示2：如果是 windows 系统，打开带中文文件，可能会引发编码错误，此时在 open() 函数中使用 errors="ignore" 参数来避免该问题
+# 提示3：使用递归搜索反而会更简单一些
+
+def get_files(p, files):
+    for each in p.iterdir():
+        if str(each) == __file__: # 跳过本文件
+            continue
+        if each.is_file() and each.suffix == ".py":
+            files.append(each)
+        if each.is_dir():
+            p = each
+            get_files(p, files)
+    return files
+
+def count_lines(files):
+    lines = 0
+    for each in files:
+        with open(each, "r", errors="ignore") as f1: # 忽略错误编码
+            t = f1.readlines()
+            lines += len(t) - t.count("\n")
+    return lines
+
+p = Path(r".\target1")
+files = []
+
+files = get_files(p, files)
+print(f"一共有{count_lines(files)}行代码")
+
+
+# 编写一个源代码文件，其功能就是在当前文件夹下创建 10 个子文件夹，每个子文件夹下又放入自身的 10 个拷贝
+def create_files(p, n):
+    if n == 0:
+        return None
+    else:
+        # p / f"{n-1}.py" 是拼接源代码的文件名
+        with open(__file__, "r", encoding="utf-8") as f1, open(p / f"{n-1}.py", "w", encoding="utf-8") as f2:
+            f2.write(f1.read())
+        create_files(p, n-1)
+
+def create_dirs(cwd, n):
+    if n == 0:
+        return None
+    else:
+        p = cwd / str(n-1) # 拼接新文件夹的路径
+        p.mkdir(exist_ok=True) # 确保文件夹已存在也不会报错
+        create_files(p, 10) # 创建10个源代码文件拷贝
+        create_dirs(cwd, n-1)
+
+# create_dirs(Path.cwd(), 10)
+
+```
+
+
+
