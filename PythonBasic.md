@@ -5400,7 +5400,7 @@ f.truncate(15)
 f.close()
 
 # 打开自己的源文件，然后打印出来
-f3 = open("fileDemo_01.py", "r", encoding="utf-8")
+f3 = open("errorDemo_01.py", "r", encoding="utf-8")
 for line in f3:
     print(line, end="")
 f3.close()
@@ -5483,14 +5483,14 @@ for i in m.iterdir():
     print(i)
 # D:\Program_Repository\github\basic\file\file01.py
 # D:\Program_Repository\github\basic\file\file02.py
-# D:\Program_Repository\github\basic\file\fileDemo_01.py
+# D:\Program_Repository\github\basic\file\errorDemo_01.py
 # D:\Program_Repository\github\basic\file\FishD.txt
 # D:\Program_Repository\github\basic\file\target.zip
 # D:\Program_Repository\github\basic\file\test
 # D:\Program_Repository\github\basic\file\test.jpg
 
 print([i for i in m.iterdir() if i.is_file()])
-# [WindowsPath('D:/Program_Repository/github/basic/file/file01.py'), WindowsPath('D:/Program_Repository/github/basic/file/file02.py'), WindowsPath('D:/Program_Repository/github/basic/file/fileDemo_01.py'), WindowsPath('D:/Program_Repository/github/basic/file/FishD.txt'), WindowsPath('D:/Program_Repository/github/basic/file/target.zip'), WindowsPath('D:/Program_Repository/github/basic/file/test.jpg')]
+# [WindowsPath('D:/Program_Repository/github/basic/file/file01.py'), WindowsPath('D:/Program_Repository/github/basic/file/file02.py'), WindowsPath('D:/Program_Repository/github/basic/file/errorDemo_01.py'), WindowsPath('D:/Program_Repository/github/basic/file/FishD.txt'), WindowsPath('D:/Program_Repository/github/basic/file/target.zip'), WindowsPath('D:/Program_Repository/github/basic/file/test.jpg')]
 
 # 路径修改
 # mkdir() 创建文件夹
@@ -5535,7 +5535,7 @@ for each in p2:
     print(each)
 # ..\file\file01.py
 # ..\file\file02.py
-# ..\file\fileDemo_01.py
+# ..\file\errorDemo_01.py
 
 p = Path(".")
 p3 = list(p.glob("**/*.py")) # 当前目录及下一级目录
@@ -5543,7 +5543,7 @@ for each in p3:
     print(each)
 # file01.py
 # file02.py
-# fileDemo_01.py
+# errorDemo_01.py
 p4 = list(p.glob("*/*.py")) # 下一级目录
 print(p4) # []
 
@@ -5593,7 +5593,7 @@ for i in p.iterdir():
     print(f"文件名：{i}，文件尺寸：{i.stat().st_size}字节")
 # 文件名：file01.py，文件尺寸：1491字节
 # 文件名：file02.py，文件尺寸：4581字节
-# 文件名：fileDemo_01.py，文件尺寸：813字节
+# 文件名：errorDemo_01.py，文件尺寸：813字节
 # 文件名：fileDemo_02.py，文件尺寸：750字节
 # 文件名：FishD.txt，文件尺寸：5字节
 # 文件名：target.zip，文件尺寸：179字节
@@ -5611,7 +5611,7 @@ for i in n:
     print(f"文件名：{i}，修改时间：{strftime('%Y-%m-%d %H-%M-%S', localtime(i.stat().st_mtime))}")
 # 文件名：file01.py，修改时间：2025-06-01 17-28-15
 # 文件名：file02.py，修改时间：2025-06-05 01-56-27
-# 文件名：fileDemo_01.py，修改时间：2025-06-01 17-38-15
+# 文件名：errorDemo_01.py，修改时间：2025-06-01 17-38-15
 # 文件名：fileDemo_02.py，修改时间：2025-06-05 17-22-00
 # 文件名：FishD.txt，修改时间：2025-06-05 01-33-49
 # 文件名：target.zip，修改时间：2025-06-01 17-33-13
@@ -5797,4 +5797,136 @@ def create_dirs(cwd, n):
 ```
 
 
+
+# 15.异常
+
+## 异常捕获
+
+```python
+# 异常捕获
+# try-except 捕获异常
+# 异常后加as 可以打印出异常来
+# e 指向对应的异常类，比如这里是 TypeError，那么它就是 <class 'TypeError'>
+try:
+    1 / 0
+except ZeroDivisionError as e:
+    print(e) # division by zero
+
+# 有时候没把握出现的会是哪个异常,，可以把可能出现的异常放到元组中
+try:
+    520 + "FishC"
+    1 / 0 # 上一行异常，这行未运行
+except (ZeroDivisionError, TypeError, ValueError) as e:
+    print(e) #unsupported operand type(s) for +: 'int' and 'str'
+
+try:
+    1 / 0
+    520 + "FishC" # 上一行异常，这行未运行
+except ZeroDivisionError:
+    print("除数不能为0")
+except ValueError:
+    print("值不正确")
+except TypeError:
+    print("类型不正确")
+# 除数不能为0
+
+# locals(); 查看当前所有变量
+# 测试是否定义过一个值 f in locals();
+# 可以检测是否关闭文件
+
+# assert：断言；当这个关键字后边的条件为假的时候，程序自动崩溃并抛出AssertionError的异常。 可以用 assert **Error 来自定断言异常类型
+
+# 如果试图引用一个未曾定义过的变量，Python 会抛出NameError异常
+# 如果试图访问一个对象中不存在的属性，Python 会抛出AttributeError异常
+
+```
+
+
+
+## 异常练习
+
+```python
+# 异常练习
+# eval() 返回表达式的执行结果
+# 利用异常捕获机制，使用 while 循环语句来实现 for 循环语句的功能。
+# 相当于将下面代码使用 while 语句来实现：
+# 8*BkG^xR&Nry_~aO69FIe3VHJYp
+x = "FishC"
+# for each in x:
+#   print(each)
+y = iter(x)
+while True:
+    try:
+        print(next(y))
+    except StopIteration:
+        break
+
+
+# 利用 Python 异常机制，编写一个检查用户输入语句是否有错误的程序。
+# 程序能够识别出 “语法错误”、“索引错误”、“变量未定义”、“除数为0” 和 “传入参数类型不恰当” 这几个错误类型。
+
+while True:
+    text = input("请输入一行语句：")
+    if text == "q":
+        break
+    try:
+        # eval() 返回表达式的执行结果
+        y = eval(text)
+        if y:
+            print(f"结果是：{y}")
+    except ZeroDivisionError:
+        print("除数不能为0")
+    except NameError:
+        print("变量未定义")
+    except IndexError:
+        print("索引错误")
+    except SyntaxError:
+        print("语法错误")
+    except (TypeError, ValueError):
+        print("传入参数类型不恰当")
+print("程序结束")
+
+```
+
+
+
+## 主动异常
+
+```python
+# 异常
+# try-except-else    try-except-finally
+# raise语句 直接抛出异常，主动引发异常
+# raise ValueError("值不正确") # 报错ValueError
+# assert语句 断言 只能引发AssertionError异常    常用于调试    类似于if语句
+s = "FishC"
+assert s == "FishC" # 为真，什么都不发生
+# assert s != "FishC" # 为假，报错AssertionError
+
+# 用异常来实现goto语句（勿用）
+try:
+    while True:
+        while True:
+            for i in range(10):
+                if i > 3:
+                    # 可以无指定异常，但会爆红，抛出异常后，except捕获异常，直接跳出循环
+                    raise
+                    # raise 如果不带任何参数，抛出的异常为RuntimeError，
+                    # 当检测到一个不归属于任何其他类别的错误时，就会引发 RuntimeError 异常，关联的值是一个指示问题原因的字符串，
+                    # 由于我们是直接 raise 引发，所以它这个字符串 No active exception to reraise 的意思大概就是说这个异常属于 “无中生有”。
+                print(i)
+            print("break")
+        print("break")
+    print("break")
+except:
+    print("到这里来了")
+
+# 实现在捕获异常之后，打印一句 “出错啦”，再重新抛出相对应的异常（注意，这里我们说的异常并不特指具体的哪一类，而是泛指所有的异常）。
+# 利用不带参数的 raise 语句即可实现
+try:
+    1 / 0
+except:
+    print("出错啦~")
+    raise
+    
+```
 
