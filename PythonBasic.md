@@ -5930,3 +5930,597 @@ except:
     
 ```
 
+
+
+# 16. 类和对象
+
+## 16.1. 对象
+
+```python
+# 对象
+# 对象 = 属性 + 方法
+# 封装 创建对象之前将相关的属性和方法通过类打包到一起
+# 创建对象需要先创建一个类class，再创建对象
+# 创建类
+class Turtle: # 类命名以大写字母开头
+    head = 1
+    eyes = 2
+    legs = 4
+    shell = True # 壳
+
+    # self 实例对象本身，调用时通过self传递对象信息
+    # self 在对象访问方法时自动进行传递，不需要显式传递
+    def crawl(self): # 爬
+        print("爬")
+
+    def run(self):
+        print("跑")
+
+    def bite(self):
+        print("咬")
+
+    def eat(self):
+        print("吃")
+
+    def sleep(self):
+        print("睡觉")
+
+# 创建对象
+t1 = Turtle()
+# 调用类的属性，方法
+print(t1.head) # 1
+t1.eat() # 吃
+
+
+t2 = Turtle()
+# 改变或创建对象特有属性和方法
+t2.legs = 3
+print(t2.legs) # 3
+t2.mouth = 1
+print(t2.mouth) # 1
+
+
+# dir(t)查看属性
+print(dir(t1))
+# ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__firstlineno__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__static_attributes__', '__str__', '__subclasshook__', '__weakref__', 'bite', 'crawl', 'eat', 'eyes', 'head', 'legs', 'run', 'shell', 'sleep']
+print(dir(t2))
+# ['__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__firstlineno__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__static_attributes__', '__str__', '__subclasshook__', '__weakref__', 'bite', 'crawl', 'eat', 'eyes', 'head', 'legs', 'mouth', 'run', 'shell', 'sleep']
+
+
+# 基于统一个类的两个对象，但它们并不相同，也并不相等。但它们所拥有的属性，确都是来自于同一个类的
+
+```
+
+
+
+### 16.1.1 创建类
+
+```python
+# 创建类
+# 设计一个 Person 类，该类有 name 和 age 两个属性（分别用于指定对象的姓名和年龄），该类还有 set_name()、set_age()、get_name() 和 get_age() 四个方法（分别用于设置、获取对象的姓名和年龄）
+class Person:
+    name = None
+    age = None
+    def set_name(self):
+        self.name = input("请输入名字：")
+
+    def set_age(self):
+        self.age = input("请输入年龄：")
+
+    def get_name(self):
+        if self.name:
+            return self.name
+        else:
+            print("名字未设置")
+
+    def get_age(self):
+        if self.age:
+            return self.age
+        else:
+            print("年龄未设置")
+
+# 设计一个 Rectangle 类，该类有 length 和 width 两个属性（分别用于指定长方形的长度和宽度），该类还有 set_length()、set_width()、get_ perimeter() 和 get_area() 四个方法（分别用于设置长方形的长和宽，以及获取长方形的周长和面积）
+class Rectangle:
+    length = None
+    width = None
+
+    def set_length(self):
+        self.length = input("请输入矩形的长度：")
+
+    def set_width(self):
+        self.width = input("请输入矩形的宽度：")
+
+    def get_perimeter(self):
+        if not self.length:
+            self.set_length()
+
+        if not self.width:
+            self.set_width()
+
+        return (self.length + self.width) * 2
+
+    def get_area(self):
+        if not self.length:
+            self.set_length()
+
+        if not self.width:
+            self.set_width()
+
+        return self.length * self.width
+
+```
+
+
+
+## 16.2 继承
+
+```python
+# 继承
+# 在类中定义类属性，并不会被类方法直接通过变量名访问到，需要通过 self.属性 来访问
+class A:
+    x = 520
+    def hello(self):
+        print("hello,我是A")
+
+# class B(A) B类 继承 A类
+class B(A):
+    pass
+
+b = B()
+b.hello() # hello,我是A
+
+class C(A):
+    x = 888
+    def hello(self):
+        print("hello,我是C")
+c = C()
+print(c.x) # 888
+c.hello() # hello,我是C
+
+# isinstance() 判断对象是否属于某个类
+print(isinstance(c, C)) # True
+print(isinstance(c, A)) # True
+
+# issubclass() 判断一个类是否为某个类的子类
+print(issubclass(C, A)) # True
+
+class B:
+    x = 888
+    y = 666
+    def hello(self):
+        print("hello,<UNK>B")
+
+# 同时继承两个类，访问顺序从左到右
+class C(A, B): pass
+c = C()
+print(c.x) # 520
+print(c.y) # 666
+c.hello() # hello,我是A
+
+
+# 组合
+# 将多个类的实例放到一个类中
+class Turtle:
+    def say(self):
+        print("乌龟")
+
+class Cat:
+    def say(self):
+        print("喵")
+
+class Dog:
+    def say(self):
+        print("汪")
+
+# 将多个类的实例化对象放到一个类中
+class Garden:
+    t = Turtle()
+    cat = Cat()
+    dog = Dog()
+    def say(self):
+        self.t.say()
+        self.cat.say()
+        self.dog.say()
+
+g = Garden()
+g.say()
+# 乌龟
+# 喵
+# 汪
+
+# 可以在子类中修改父类的属性
+class D(B):
+    B.y = 111
+print(B.y) # 111
+
+```
+
+
+
+### 16.2.1 动物园组合
+
+```python
+# 动物园组合
+# 定义一个动物园类（Zoo），里面有鸟类如 1 只孔雀（Peacock）、2 只天鹅（Swan）、3 只八哥（Myna），猫科动物类如 4 头狮子（Lion）、5 头老虎（Tiger）、6 头豹子（Leopard），灵长类（Primate）如 7 只猴子（Monkey）、8 只猩猩（Chimpanzee）、9 只狒狒（Baboon），只需要定义类的构成框架就行，内部用 pass 语句填充即可
+class Birds:
+    pass
+
+class Peacock:
+    pass
+
+class Swan:
+    pass
+
+class Myna:
+    pass
+
+
+class Cats:
+    pass
+
+class Lion:
+    pass
+
+class Tiger:
+    pass
+
+class Leopard:
+    pass
+
+
+class Primate:
+    pass
+
+class Monkey:
+    pass
+
+class Chimpanzee:
+    pass
+
+class Baboon:
+    pass
+
+
+class zoo:
+    peacocks = Peacock()
+    swan = [Swan(), Swan()]
+    mynas = [Myna(), Myna(), Myna()]
+    lions = [Lion() for i in range(4)]
+    tigers = [Tiger() for i in range(5)]
+    leopards = [Leopard() for i in range(6)]
+    monkeys = [Monkey() for i in range(7)]
+    chimpanzees = [Chimpanzee() for i in range(8)]
+    baboons = [Baboon() for i in range(9)]
+
+```
+
+
+
+## 16.3 绑定
+
+```python
+# 绑定
+# self 将实例对象和类进行绑定
+class C:
+    y = 200
+    def get_self(self):
+        print(self)
+
+c = C()
+c.x = 100
+# c.__dict__ 查看对象私有属性，公有属性不会显示
+print(c.__dict__) # {'x': 100}
+c.y = 300
+print(c.__dict__) # {'x': 100, 'y': 300}
+
+
+# 在类中给实例化对象赋予私有属性
+class C:
+    def set_x(self, x):
+        self.x = x
+c = C()
+print(c.__dict__) # {}
+# 在方法中传入参数
+c.set_x(100)
+print(c.x) # 100
+print(c.__dict__) # {'x': 100}
+
+
+# __init__ 初始化参数
+class C:
+    def __init__(self, x):
+        self.x = x
+# 直接在创建对象时传入参数
+c = C(10)
+print(c.x)  # 10
+
+# 类还可以作为字典来使用，通过对象来作为字典使用更好
+class F:
+    pass
+f = F()
+f.x = 1
+f.y = "FishC"
+f.z = [1, 2, 3]
+print(f.x, f.y, f.z) # 1 FishC [1, 2, 3]
+
+
+# 字典
+d = {}
+d["x"] = 1
+d["y"]= "FishC"
+d["z"]= [1, 2, 3]
+print(d["x"], d["y"], d["z"]) # 1 FishC [1, 2, 3]
+
+
+x = 123
+class C:
+    x = 100
+    def get_x(self):
+        print(f"x = {x}")
+        print(f"self.x = {self.x}")
+c = C()
+c.get_x()
+# x = 123
+# self.x = 100
+c.x = 250
+c.get_x()
+# x = 123
+# self.x = 250
+
+```
+
+
+
+### 16.3.1 菜单
+
+```python
+# 菜单
+class Meet:
+    nums = 0
+
+class Egg(Meet):
+    name = "鸡蛋"
+    price = 1
+
+class Beef(Meet):
+    name = "牛肉"
+    price = 25
+
+class Mutoon(Meet):
+    name = "羊肉"
+    price = 30
+
+class Vegetable:
+    nums = 0
+
+class Onion(Vegetable):
+    name = "洋葱"
+    price = 2
+
+class Tomato(Vegetable):
+    name = "番茄"
+    price = 2
+
+class Potato(Vegetable):
+    name = "土豆"
+    price = 3
+
+class Radish(Vegetable):
+    name = "萝卜"
+    price = 3
+
+class Memu:
+    def order(self):
+        self.x = []
+        print("客官想要吃点什么？")
+
+        dishes = input("1.洋葱炒牛肉；2.洋葱炒羊肉；3.煎蛋；4.番茄炒蛋；5.土豆萝卜炖羊肉：")
+        dishes = dishes.split()
+        while dishes:
+            dish = dishes.pop(0)
+            if dish == "1":
+                mutoon = Mutoon()
+                mutoon.nums = 1
+                onion = Onion()
+                onion.nums = 1
+                self.x.append([mutoon, onion])
+
+            if dish == '2':
+                onion = Onion()
+                onion.num = 1
+                mutoon = Mutoon()
+                mutoon.num = 1
+                self.x.extend([mutoon, onion])
+
+            if dish == '3':
+                egg = Egg()
+                egg.num = 2
+                self.x.append(egg)
+
+            if dish == '4':
+                tomato = Tomato()
+                tomato.num = 2
+                egg = Egg()
+                egg.num = 3
+                self.x.extend([tomato, egg])
+
+            if dish == '5':
+                potato = Potato()
+                potato.num = 2
+                radish = Radish()
+                radish.num = 1
+                mutoon = Mutoon()
+                mutoon.num = 2
+                self.x.extend([potato, radish, mutoon])
+
+    def pay(self):
+        total = 0
+        for each in self.x:
+            total += each.price * each.num
+            print(each.name, each.price, "*", each.num)
+            print(f"感谢惠顾，您一共消费了 {total} 元，欢迎下次光临~")
+            
+```
+
+
+
+## 16.4 构造函数
+
+```python
+# 构造函数
+# __init__() 构造函数，在类中定义以个性化对象
+class C:
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+    def add(self):
+        return self.x + self.y
+    def mul(self):
+        return self.x * self.y
+c = C(2, 3)
+print(c.add()) # 5
+print(c.mul()) # 6
+print(c.__dict__) # {'x': 2, 'y': 3}
+
+
+# 重写
+# 子类重写父类的方法来覆盖为自己的方法
+class A:
+    def __init__(self):
+        print("A")
+
+class B1(A):
+    def __init__(self):
+        A.__init__(self)
+        print("B1")
+
+class B2(A):
+    def __init__(self):
+        A.__init__(self)
+        print("B2")
+
+class C(B1, B2):
+    def __init__(self):
+        B1.__init__(self)
+        B2.__init__(self)
+        print("C")
+c = C()
+# A
+# B1
+# A
+# B2
+# C
+# A重复调用了
+
+# super 父类，在多重继承时可以避免重复调用
+# 自动根据 MRO 顺序查找， Method Resolution Order 方法解析顺序
+class A:
+    def __init__(self):
+        print("A")
+
+class B1(A):
+    def __init__(self):
+        super().__init__()
+        print("B1")
+
+class B2(A):
+    def __init__(self):
+        super().__init__()
+        print("B2")
+
+class C(B1, B2):
+    def __init__(self):
+        super().__init__()
+        print("C")
+c = C()
+# A
+# B2
+# B1
+# C
+
+# 查看mro    mro() 或 __mro__
+print(C.mro())
+# [<class '__main__.C'>, <class '__main__.B1'>, <class '__main__.B2'>, <class '__main__.A'>, <class 'object'>]
+print(B1.mro())
+# [<class '__main__.B1'>, <class '__main__.A'>, <class 'object'>]
+
+```
+
+
+
+### 16.4.1 文件搜索
+
+```python
+# 文件搜索
+# 先打印路径结构
+# 然后通过类和对象的方式来存储每一个文件信息（包含文件名、文件尺寸、位置、创建时间、修改时间和访问时间），并定义相应的方法来获取这些文件信息
+# 最后编写一个搜索函数，通过提供文件名的方式搜索对应的文件位置和信息
+from time import strftime, localtime
+from pathlib import Path
+class File:
+    def __init__(self, name, size, folder, ctime, mtime, atime):
+        self.name = name
+        self.size = size
+        self.folder = folder
+        self.ctime = ctime
+        self.mtime = mtime
+        self.atime = atime
+
+    def get_name(self):
+        return self.name
+
+    def get_size(self):
+        return f"{self.size}字节"
+
+    def get_folder(self):
+        return f"位置：{self.folder}"
+
+    def get_ctime(self):
+        return f"创建时间：{strftime("%Y-%m-%d %H:%M:%S", localtime(self.ctime))}"
+
+    def get_mtime(self):
+        return f"修改时间：{strftime("%Y-%m-%d %H:%M:%S", localtime(self.mtime))}"
+
+    def get_atime(self):
+        return f"访问时间：{strftime("%Y-%m-%d %H:%M:%S", localtime(self.atime))}"
+
+def get_file_msg(path):
+    p = Path(path)
+    paths = []
+    files = []
+    for i in p.glob("**/*"):
+        paths.append(i)
+        if i.is_file():
+            name = i.name
+            size = i.stat().st_size
+            folder = i.parent.resolve()
+            ctime = i.stat().st_ctime
+            mtime = i.stat().st_mtime
+            atime = i.stat().st_atime
+            files.append(File(name, size, folder, ctime, mtime, atime))
+
+    print("路径结构如下：")
+    for each in paths:
+        print(each)
+
+    return files
+
+def sear_file(files):
+    count = 0
+    filename = input("\n请输入想要搜索的文件名：")
+    for each in files:
+        if filename in each.name:
+            count += 1
+            print(f"\n找到相关文件（{count}）-> {each.get_name()}（{each.get_size()}）")
+            print(each.get_folder())
+            print(each.get_ctime())
+            print(each.get_mtime())
+            print(each.get_atime())
+        else:
+            print("找不到相关文件！")
+
+files = get_file_msg("target")
+sear_file(files)
+
+```
+
