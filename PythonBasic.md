@@ -5843,7 +5843,7 @@ except TypeError:
 
 
 
-## 异常练习
+## ==异常练习==
 
 ```python
 # 异常练习
@@ -6448,7 +6448,7 @@ print(B1.mro())
 
 
 
-### 16.4.1 文件搜索
+### ==16.4.1 文件搜索==
 
 ```python
 # 文件搜索
@@ -6524,3 +6524,891 @@ sear_file(files)
 
 ```
 
+
+
+## 16.5Mixin（设计模式）混入
+
+```python
+# Mixin Mix-in 混入，临时加入 一种设计模式
+class Animal:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+
+    def say(self):
+        print(f"我叫{self.name}，今年{self.age}岁")
+
+# 临时想给 pig 添加一个飞行的技能
+class FlyMixin:
+    def fly(self):
+        print("我也会飞了")
+
+# 多继承
+class Pig(FlyMixin, Animal):
+    def special(self):
+        print("我的技能是拱白菜")
+
+p = Pig("大肠", 5)
+p.say() # 我叫大肠，今年5岁
+p.special() # 我的技能是拱白菜
+p.fly() # 我也会飞了
+
+
+# ————————————————————————————————————————————————————————————
+# super 与 MRO顺序
+# 当 super 无直接父类时： 会根据对象直接对应的类的 MRO顺序 来找寻其“父类”
+# self 也取决于当前对象
+class Displayer:
+    def display(self, message):
+        print(message)
+
+class LoggerMixin:
+    def log(self, message, filename="logfile.txt"):
+        with open(filename, "w") as f:
+            f.write(message)
+
+    def display(self, message):
+        super().display(message)
+        self.log(message)
+
+class MySubClass(LoggerMixin, Displayer):
+    def log(self, message):
+        super().log(message, "subclasslog.txt")
+
+subclass = MySubClass()
+subclass.display("This is a test")
+
+```
+
+
+
+### ==16.5.1 鱼C超市会员管理系统==
+
+```python
+# 鱼C超市会员管理系统。
+# 1. 会员开卡
+# 会员开卡自动赋予一个新的卡号（默认从 10000 开始递增）
+# 要求输入用户名和密码
+# 密码要求长度不低于 6 位
+
+# 2. 修改密码
+# 先确认输入卡号是否存在
+# 再判断旧密码是否正确
+# 新密码长度同样不能低于 6 位
+#
+# 3. 商品支付
+# 先确认输入卡号是否存在
+# 再判断密码是否正确
+# 根据输入的消费金额增加会员卡积分（比如输入 250 消费金额，那么积分增加 250）
+#
+# 4. 积分查询
+# 先确认输入卡号是否存在
+# 再判断密码是否正确
+#
+# 代码要求：
+# 1. 创建一个会员类（Member），包含信息：卡号、用户名、密码（要求密码需要以 MD5 哈希值的形式存储）、积分、注册日期
+# 2. 创建一个管理类（Manage），用于实现上方要求的主要程序功能
+# 3. 创建一个 Mixin 类（PasswdMixin），用于实现密码相关的功能组件（密码长度检测和将明文密码转换为 MD5 的操作）
+# 4. 创建一个 Mixin 类（LoggerMixin），用于实现日志记录相关的功能组件
+import hashlib
+import time
+
+# 卡号、用户名、密码、积分、注册日期
+class Member:
+    def __init__(self, cardid, name, password, scores, regdata):
+        self.cardid = cardid
+        self.name = name
+        self.password = password
+        self.scores = scores
+        self.regdata = regdata
+
+# 密码长度检测和将明文密码转换为 MD5
+class PasswdMixin:
+    def tooshort(self, password, request=6):
+        while len(password) < request:
+            password = input(f"会员密码不能小于{request}位，请重新输入")
+        return password
+
+    def to_md5(self, password):
+        password = hashlib.md5(password.encode('utf-8')).hexdigest()
+        return password
+
+# 实现日志记录相关的功能
+class LoggerMixin:
+    def log(self, message, filename="log.txt"):
+        with open(filename, "a") as f:
+            f.write(message)
+
+
+# 主要功能
+class Manager(PasswdMixin, LoggerMixin):
+    def __init__(self):
+        self.member = {}
+        self.cardid = 10000
+
+    def welcome(self):
+        print("欢迎来到超市会员管理系统")
+        command = 0
+        while command != "5":
+            command = input("\n1.创建新卡;2.修改密码;3.商品支付;4.积分查询;5.退出程序：")
+            if command == "1":
+                self.create_member()
+            elif command == "2":
+                self.change_password()
+            elif command == "3":
+                self.pay()
+            elif command == "4":
+                self.check_scores()
+            elif command == "5":
+                print("感谢使用超市会员管理系统")
+
+    def create_member(self):
+        name = input("请输入姓名：")
+        password = input("请输入密码:")
+        password = self.tooshort(password)
+        password = self.to_md5(password)
+        regdata = time.localtime()
+        scores = 0
+        member = Member(self.cardid, name, password, scores, regdata)
+        self.member[self.cardid] = member
+        print(f"创建成功，卡号为 {self.cardid}，关联用户 -> {name}")
+        self.log(f"开卡成功: {self.cardid} -> {name}, 时间:{time.strftime("%Y-%m-%d %H:%M:%S", regdata)}")
+        self.cardid = self.cardid + 1
+
+    def confirm_password(self):
+        cardid = int(input("请输入卡号:"))
+        while cardid not in self.member:
+            cardid = input("该卡号不存在,请重新输入:")
+
+        password = input("请输入密码:")
+        password = self.to_md5(password)
+        while not self.member[cardid].password == password:
+            password = input("密码错误,请重新输入:")
+            password = self.to_md5(password)
+        return cardid
+
+    def change_password(self):
+        cardid = self.confirm_password()
+        newpassword = input("请输入新密码:")
+        newpassword = self.tooshort(newpassword)
+        newpassword = self.to_md5(newpassword)
+        self.member[cardid].password = newpassword
+        self.log(f"修改密码: 卡号 -> {cardid}, 时间: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())})")
+        print("密码修改成功.")
+
+    def pay(self):
+        cardid = self.confirm_password()
+        money = input("请输入支付金额:")
+        self.member[cardid].scores += money
+        self.log(f"积分累计: 卡号 -> {cardid}, +{money}分, 时间: {time.strftime('%Y-%m-%d %H:%M:%S', time.localtime())}")
+
+    def check_scores(self):
+        cardid = self.confirm_password()
+        print(f"卡号 {cardid} 当前的消费积分为: {self.member[cardid].scores}")
+
+def main():
+    m = Manager()
+    m.welcome()
+
+if __name__ == '__main__':
+    main()
+
+```
+
+
+
+## 16.6 多态
+
+```python
+# 多态
+# 指函数可以根据不同的对象执行不同的操作
+# 类的继承与重写方法：类与对象中实现多态的一种方式
+class Shape: # 形状
+    def __init__(self, name):
+        self.name = name
+    def area(self):
+        pass
+
+class Square(Shape): # 正方形
+    def __init__(self, length):
+        super().__init__('正方形')
+        self.length = length
+    def area(self):
+        return self.length * self.length
+
+class Circle(Shape): # 圆形
+    def __init__(self, radius): # 半径
+        super().__init__('圆形')
+        self.radius = radius
+    def area(self):
+        return self.radius * self.radius * 3.14
+
+class Triangle(Shape): # 三角形
+    def __init__(self, base, height): # 底和高
+        super().__init__('三角形')
+        self.base = base
+        self.height = height
+    def area(self):
+        return self.base * self.height / 2
+
+s = Square(5)
+c = Circle(6)
+t = Triangle(3, 4)
+print(s.name, s.area()) # 正方形 25
+print(c.name, c.area()) # 圆形 113.04
+print(t.name, t.area()) # 三角形 6.0
+
+# —————————————————————————————————————————————————————————
+class Cat:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def intro(self):
+        print(f"我是一只猫咪，我叫{self.name}，今年{self.age}岁")
+    def say(self):
+        print("喵~")
+
+class Dog:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def intro(self):
+        print(f"我是一只修狗，我叫{self.name}，今年{self.age}岁")
+    def say(self):
+        print("汪~")
+
+class Pig:
+    def __init__(self, name, age):
+        self.name = name
+        self.age = age
+    def intro(self):
+        print(f"我是一只猪，我叫{self.name}，今年{self.age}岁")
+    def say(self):
+        print("oink~")
+
+c = Cat("web", 4)
+d = Dog("布布", 7)
+p = Pig("大肠", 5)
+
+# 给函数传递不同的对象
+# 鸭子类型 不需要关注传入的是什么类型，只要它符合这里面的 intro 和 say 方法， 它就属于这个类型
+def animal(x):
+    x.intro()
+    x.say()
+
+animal(c)
+# 我是一只猫咪，我叫web，今年4岁
+# 喵~
+animal(d)
+# 我是一只修狗，我叫布布，今年7岁
+# 汪~
+animal(p)
+# 我是一只猪，我叫大肠，今年5岁
+# oink~
+
+class Bicycle:
+    def intro(self):
+        print("走过多远的路")
+    def say(self):
+        print("继续走")
+b = Bicycle()
+animal(b)
+# 走过多远的路
+# 继续走
+
+```
+
+
+
+### ==16.6.1 企业员工管理程序==
+
+```python
+# 企业员工管理程序
+# a. 员工分类：普通员工（Employee）、组长（Teamleader）、经理（Manager）
+# b. 员工属性：姓名（name）、职位（job）、级别（grade）、工龄（year）、工号（uid）
+# c. 员工方法：
+# get_uid() -- 获取工号
+# get_name() -- 获取姓名
+# get_job() -- 获取职位
+# get_grade() -- 获取级别
+# get_year() -- 获取工龄
+# salary() -- 统计并返回工资（计算方法如下）
+#
+# d. 员工工资计算方法：
+# 普通员工：3000 + 500 * 级别 + 50 * 工龄
+# 组长：4000 + 800 * 级别 + 100 * 工龄
+# 经理：5000 + 1000 * (级别 + 工龄)
+#
+# e. 程序功能：
+# 录入员工数据功能（工号自动分配，由 10000 开始）
+# 查询功能，分为员工查询和职位查询（见程序实现截图）
+# 各类员工级别数量如下：
+# 普通员工：10 级
+# 组长：6 级
+# 经理：3 级
+# 升级功能：支持增加多级；当超过当前职位最高级别时，进行升职操作（无论增加多少个级别，只要发生升职，级别一律初始化为 1 级，见程序实现截图）.
+# 降级功能：支持减少多级；当超过当前职位最高级别时，进行升职操作（无论减少多少个级别，只要发生降职，级别一律初始化为当前职位最高级别，见程序实现截图）
+class Employee:
+    def __init__(self, name, job, grade, year, uid):
+        self.name = name
+        self.job = job
+        self.grade = grade
+        self.year = year
+        self.uid = uid
+
+    def get_uid(self):
+        return self.uid
+
+    def get_name(self):
+        return self.name
+
+    def get_job(self):
+        return self.job
+
+    def get_grade(self):
+        return self.grade
+
+    def set_grade(self, grade):
+        self.grade = grade
+
+    def get_year(self):
+        return self.year
+
+    def salary(self):
+        return 3000 + 500 * self.grade + 50 * self.year
+
+class Teamleader(Employee):
+    def salary(self):
+        return 4000 + 800 * self.grade + 100 * self.year
+
+class Manager(Employee):
+    def salary(self):
+        return 5000 + 1000 * (self.grade + self.year)
+
+def main():
+    mems = {}
+    jobs = {'E': [], 'T': [], 'M': []}
+    uid = 10000
+    MAX_E_GRADE = 10
+    MAX_T_GRADE = 6
+    MAX_M_GRADE = 3
+
+    while True:
+        ins = input("\n1.录入;2.查询;3.升级;4.降级;5.退出：")
+
+        # 主线功能：录入
+        if ins == '1':
+            name = input("姓名：")
+            job = input("职位（E.普通员工;T.组长;M.经理）：")
+            year = int(input("工龄："))
+            grade = int(input("级别："))
+
+            if job == 'E':
+                while grade > MAX_E_GRADE:
+                    grade = int(input(f"该职位最高级别为{MAX_E_GRADE}，请重新录入级别："))
+
+                e = Employee(name, job, grade, year, uid)
+                mems[uid] = e
+                jobs['E'].append(e)
+
+            if job == 'T':
+                while grade > MAX_T_GRADE:
+                    grade = int(input(f"该职位最高级别为{MAX_T_GRADE}，请重新录入级别："))
+
+                e = Teamleader(name, job, grade, year, uid)
+                mems[uid] = e
+                jobs['T'].append(e)
+
+            if job == 'M':
+                while grade > MAX_M_GRADE:
+                    grade = int(input(f"该职位最高级别为{MAX_M_GRADE}，请重新录入级别："))
+
+                e = Manager(name, job, grade, year, uid)
+                mems[uid] = e
+                jobs['M'].append(e)
+
+            print(f"录入成功！姓名：{name}，工号：{uid}，薪资：{e.salary()}")
+            uid += 1
+
+        # 主线功能：查询
+        if ins == '2':
+            op = input("1.员工查询;2.职位查询：")
+
+            # 支线功能：员工查询
+            if op == '1':
+                uid = int(input("请输入工号："))
+
+                if mems.get(uid):
+                    e = mems[uid]
+                    print(f"姓名：{e.get_name()}")
+                    print(f"职位：{e.get_job()}")
+                    print(f"级别：{e.get_grade()}")
+                    print(f"工龄：{e.get_year()}")
+                    print(f"薪资：{e.salary()}")
+                else:
+                    print("该工号不存在！")
+
+            # 支线功能：职位查询
+            if op == "2":
+                job = input("职位（E.普通员工;T.组长;M.经理）：")
+
+                if job == 'E':
+                    if jobs["E"]:
+                        print(f"目前普通员工共有{len(jobs['E'])}人")
+                        for each in jobs['E']:
+                            print(f"{each.get_uid() - each.get_name()}")
+                    else:
+                        print("目前公司没有普通员工！")
+
+                if job == 'T':
+                    if jobs['T']:
+                        print(f"目前组长共有 {len(jobs['T'])} 人：")
+                        for each in jobs['T']:
+                            print(f"{each.get_uid()} - {each.get_name()}")
+                    else:
+                        print("目前公司没有组长！")
+
+                if job == 'M':
+                    if jobs['M']:
+                        print(f"目前经理共有 {len(jobs['M'])} 人：")
+                        for each in jobs['M']:
+                            print(f"{each.get_uid()} - {each.get_name()}")
+                    else:
+                        print("目前公司没有经理！")
+
+        if ins == "3":
+            uid = int(input("请输入工号："))
+
+            if mems.get(uid):
+                e = mems[uid]
+                print(f"{e.get_name}, 工号：{e.get_uid()}, 当前职位：{e.get_job()}{e.get_grade()}，当前薪资：{e.salary()}")
+
+                name = e.get_name()
+                job = e.get_job()
+                grade = e.get_grade()
+                year = e.get_year()
+                old_salary = e.get_salary()
+
+                n = int(input("请输入需要增加的级数："))
+
+                if job == 'E':
+                    if grade + n > MAX_M_GRADE:
+                        job = "T"
+                        grade = 1
+                        jobs['E'].remove(e)
+                        e = Employee(name, job, grade, year, uid)
+                        jobs['T'].append(e)
+                        mems[uid] = e
+                    else:
+                        grade = grade + n
+
+
+                elif job == 'T':
+                    if grade + n > MAX_T_GRADE:
+                        job = "M"
+                        grade = 1
+                        jobs['T'].remove(e)
+                        e = Employee(name, job, grade, year, uid)
+                        jobs['M'].append(e)
+                        mems[uid] = e
+                    else:
+                        e.set_grade(grade + n)
+
+                elif job == 'M':
+                    if grade + n > MAX_M_GRADE:
+                        print("已达到最高级别")
+                        grade = MAX_M_GRADE
+                    else:
+                        e.set_grade(grade + n)
+
+                new_salary = e.salary()
+                print(f"升级成功！\n{e.get_name}, 工号：{e.get_uid()}, 升级后职位：{e.get_job()}{e.get_grade()}，升级后薪资：{e.salary()}（+{new_salary - old_salary}）")
+            else:
+                print("该工号不存在！")
+
+        if ins == "4":
+            uid = int(input("请输入工号："))
+
+            if mems.get(uid):
+                e = mems[uid]
+                print(
+                    f"{e.get_name}, 工号：{e.get_uid()}, 当前职位：{e.get_job()}{e.get_grade()}，当前薪资：{e.salary()}")
+
+                name = e.get_name()
+                job = e.get_job()
+                grade = e.get_grade()
+                year = e.get_year()
+                old_salary = e.get_salary()
+
+                n = int(input("请输入需要减少的级数："))
+
+                if job == 'M':
+                    if grade - n <= 0:
+                        job = "T"
+                        grade = MAX_T_GRADE
+                        jobs['M'].remove(e)
+                        e = Employee(name, job, grade, year, uid)
+                        jobs['T'].append(e)
+                        mems[uid] = e
+                    else:
+                        grade = grade - n
+
+                elif job == 'T':
+                    if grade - n <= 0:
+                        job = "E"
+                        grade = MAX_E_GRADE
+                        jobs['T'].remove(e)
+                        e = Employee(name, job, grade, year, uid)
+                        jobs['E'].append(e)
+                        mems[uid] = e
+                    else:
+                        e.set_grade(grade - n)
+
+                elif job == 'E':
+                    if grade - n <= 0:
+                        print("已达到最低级别")
+                        grade = 1
+                    else:
+                        e.set_grade(grade - n)
+
+                new_salary = e.salary()
+                print(
+                    f"升级成功！\n{e.get_name}, 工号：{e.get_uid()}, 升级后职位：{e.get_job()}{e.get_grade()}，升级后薪资：{e.salary()}（+{new_salary - old_salary}）")
+            else:
+                print("该工号不存在！")
+
+        if ins == "5":
+            break
+
+main()
+
+```
+
+
+
+## 16.7 私有变量
+
+```python
+# 私有变量
+# __x  name mangling 设置"私有变量"
+# 在类实例化时，名字会被改变， 需要通过 c._C__x 获取该“私有变量“
+# 方法名同理 d._D__func() 调用方法
+# 不建议使用
+class C:
+    def __init__(self, x):
+        self.__x = x
+    def set_x(self, x):
+        self.__x = x
+    def get_x(self):
+        return self.__x
+
+c = C(250)
+# print(c.__x)  “私有变量”无法获取到值
+print(c.get_x())  # 250
+c.set_x(1)
+print(c.get_x())  # 1
+print(c.__dict__)  # {'_C__x': 1}
+print(c._C__x)  # 1 通过 _C__x 获取“私有变量”
+
+class D:
+    def __func(self):
+        print("hello world")
+d = D()
+# d.__func() 无法直接调用该方法
+d._D__func() # hello world
+
+# 动态添加“私有变量”，但动态添加的名字并不会改变，依旧是 c.__y
+c.__y = 250
+print(c.__dict__) # {'_C__x': 1, '__y': 250}
+
+# _单个下横线开头或结尾的变量  都是内部变量，最好不要去访问它
+
+
+c.x = 1
+# 通过动态添加键值对添加属性
+c.__dict__["z"] = 2
+print(c.__dict__) # {'_C__x': 1, '__y': 250, 'x': 1, 'z': 2}
+
+
+# 类 实际上 字典
+# 字典会消耗大量空间，当遇到固定空间的对象时可以使用 __slots__属性
+
+class C:
+    # 该类的对象仅有 x,y两个属性可用
+    __slots__ = ['x', 'y']
+    def __init__(self, x):
+        self.x = x
+c = C(250)
+print(c.x) # 250
+c.y = 520
+print(c.y) # 520
+
+# 当继承该类时，不会在子类生效，仍可以添加额外属性，放置于__dict__属性
+class E(C):
+    pass
+e = E(250)
+e.x = 1
+e.y = 2
+e.z = 3
+print(e.__slots__) # ['x', 'y']
+print(e.__dict__) # {'z': 3}
+
+# 想要 __slots__ 属性真正发挥功效，要求必须在整个继承链条中，每个父类和子类均做出一致的实现
+class C:
+    # __slots__ = ["x", "y"] 当父类和子类同时限制时生效
+    pass
+class D(C):
+    __slots__ = ["x", "y"]
+    def __init__(self, x, y):
+        self.x = x
+        self.y = y
+d = D(3, 4)
+d.z = 5
+print(d.__dict__) # {'z': 5}
+
+```
+
+
+
+### ==16.7.1 汽车租赁系统==
+
+```python
+# 汽车租赁系统
+# 汽车类
+# a. 车型分类：经济车型（EconomyCar）、豪华车（LuxuryCar）、跑车（SportCar）、SUV（SUV）
+# b. 车辆通用属性：品牌（brand）、星号（model）、车牌（platenum）、每天租金（dayrent）、车辆编号（carid）
+# c. 车辆通用方法：
+# get_brand() -- 获取品牌
+# get_model() -- 获取型号
+# get_platenum() -- 获取车牌
+# get_dayrent() -- 获取每天租金
+# get_carid() -- 获取车辆编号
+# calc_rent() -- 通过租赁天数和折扣计算一共需要多少租金
+#
+# d. 不同车型的特殊属性和方法：
+# 经济车型享有额外的补贴优惠
+# 豪华车需要增加保险费用
+# 跑车需要增加损耗费用
+# SUV 如果租车时间大于 7 天，原有折扣的基础上再打 7 折
+#
+# 业务类
+# a. 属性：
+# cars -- 字典类型，用于绑定车辆编号和相应的对象
+# stocks -- 字典类型，用于存放每一种车型的库存
+#
+# b. 方法：
+# operate() -- 程序入口，获取并分发指令
+# register() -- 录入汽车
+# get_stock() -- 获取库存
+# rent_car() -- 租车服务
+# return_car() -- 还车服务
+class Car:
+    # 品牌（brand）、星号（model）、车牌（platenum）、每天租金（dayrent）、车辆编号（carid）
+    def __init__(self, brand, model, platenum, dayrent, carid):
+        self.brand = brand
+        self.model = model
+        self.platenum = platenum
+        self.dayrent = dayrent
+        self.carid = carid
+
+    def get_brand(self):
+        return self.brand
+
+    def get_model(self):
+        return self.model
+
+    def get_platenum(self):
+        return self.platenum
+
+    def get_dayrent(self):
+        return self.dayrent
+
+    def get_carid(self):
+        return self.carid
+
+    def calc_rent(self, days, discount=1):
+        return self.dayrent * days * discount
+
+# 经济型
+class EconomyCar(Car):
+    # 补贴
+    def __init__(self, brand, model, platenum, dayrent, carid, subsidies):
+        super().__init__(brand, model, platenum, dayrent, carid)
+        self.subsidies = subsidies
+
+    def get_subsidies(self):
+        return self.subsidies
+
+    def calc_rent(self, days, discount=1):
+        return super().calc_rent(days, discount) - self.subsidies * days
+
+# 豪华车
+class LuxuryCar(Car):
+    # 保险
+    def __init__(self, brand, model, platenum, dayrent, carid, insurance):
+        super().__init__(brand, model, platenum, dayrent, carid)
+        self.insurance = insurance
+
+    def get_insurance(self):
+        return self.insurance
+
+    def calc_rent(self, days, discount=1):
+        return super().calc_rent(days, discount) + self.insurance * days
+
+# 跑车
+class SportCar(Car):
+    # 损耗
+    def __init__(self, brand, model, platenum, dayrent, carid, loss):
+        super().__init__(brand, model, platenum, dayrent, carid)
+        self.loss = loss
+
+    def get_loss(self):
+        return self.loss
+
+    def calc_rent(self, days, discount=1):
+        return super().calc_rent(days, discount) + self.loss * days
+
+# SUV
+class SUV(Car):
+    def calc_rent(self, days, discount=1):
+        if days > 7:
+            return super().calc_rent(days, discount) * 0.7
+
+class CarOperation:
+    # cars -- 字典类型，用于绑定车辆编号和相应的对象
+    # stocks -- 字典类型，用于存放每一种车型的库存
+    def __init__(self):
+        self.cars = {}
+        self.stocks = {"Economy":[], "Luxury":[], "Sport":[], "SUV":[]}
+        self.carid1 = 10000
+        self.carid2 = 20000
+        self.carid3 = 30000
+        self.carid4 = 40000
+
+    # 指令
+    def operate(self):
+        print("欢迎使用鱼C汽车租赁程序")
+        while True:
+            ins = input("1.录入汽车；2.租车服务；3.还车服务；4.退出程序：")
+            if ins == "1":
+                self.register()
+            if ins == "2":
+                self.rent_car()
+            if ins == "3":
+                self.return_car()
+            if ins == "4":
+                break
+
+    # 录入
+    def register(self):
+        op = input("\n1.经济车型；2.豪华车；3.跑车；4.SUV：")
+        num = int(input("\n请输入需要录入的数量："))
+        for i in range(num):
+            print(f"\n请录入第{i + 1}量车")
+            brand = input("品牌：")
+            model = input("型号：")
+            platenum = input("车牌：")
+            dayrent = input("租金：")
+
+            if op == "1":
+                subsidies = input("补贴：")
+                c = EconomyCar(brand, model, platenum, dayrent, self.carid1, subsidies)
+                self.cars[self.carid1] = c
+                self.stocks["Economy"].append(c)
+                self.carid1 += 1
+
+            if op == "2":
+                insurance = float(input("保险："))
+                c = LuxuryCar(brand, model, platenum, dayrent, self.carid2, insurance)
+                self.cars[self.carid2] = c
+                self.stocks["Luxury"].append(c)
+                self.carid2 += 1
+
+            if op == "3":
+                loss = float(input("损耗："))
+                c = SportCar(brand, model, platenum, dayrent, self.carid3, loss)
+                self.cars[self.carid3] = c
+                self.stocks["Sport"].append(c)
+                self.carid3 += 1
+
+            if op == "4":
+                c = SUV(brand, model, platenum, dayrent, self.carid4)
+                self.cars[self.carid4] = c
+                self.stocks["SUV"].append(c)
+                self.carid4 += 1
+
+    # 获取库存
+    def get_stock(self):
+        print(f"\n1.经济车型（享有补贴），共有{len(self.stocks['Economy'])}")
+        if self.stocks["Economy"]:
+            for each in self.stocks['Economy']:
+                print(f"车辆编号：{each.get_carid()}，品牌：{each.get_brand()}，型号：{each.get_model()}， 日租金：{each.get_dayrent()} - {each.get_subsidies()}（补贴）元")
+
+        print(f"\n2. 豪华车（需额外购买保险），共有 {len(self.stocks['Luxury'])} 辆。")
+        if self.stocks["Luxury"]:
+            for each in self.stocks['Luxury']:
+                print(f"车辆编号：{each.get_carid()}，品牌：{each.get_brand()}，型号：{each.get_model()}， 日租金：{each.get_dayrent()} + {each.get_insurance()}（保险）元")
+
+        print(f"\n3. 跑车（需增加损耗费用），共有 {len(self.stocks['Sport'])} 辆。")
+        if self.stocks["Sport"]:
+            for each in self.stocks['Sport']:
+                print(f"车辆编号：{each.get_carid()}，品牌：{each.get_brand()}，型号：{each.get_model()}， 日租金：{each.get_dayrent()} + {each.get_loss()}（损耗）元")
+
+        print(f"\n4. SUV（租赁超过7天，享有额外折上7折优惠），共有 {len(self.stocks['SUV'])} 辆。")
+        if self.stocks["SUV"]:
+            for each in self.stocks['SUV']:
+                print(f"车辆编号：{each.get_carid()}，品牌：{each.get_brand()}，型号：{each.get_model()}， 日租金：{each.get_dayrent()}元")
+
+    # 租车
+    def rent_car(self):
+        self.get_stock()
+        carid = input("请输入需要租赁的车辆编号：")
+        if self.cars.get(carid):
+            car = self.cars[carid]
+            if carid // 10000 == 1:
+                self.stocks["Economy"].remove(car)
+            if carid // 10000 == 2:
+                self.stocks["Luxury"].remove(car)
+            if carid // 10000 == 3:
+                self.stocks["Sport"].remove(car)
+            if carid // 10000 == 4:
+                self.stocks["SUV"].remove(car)
+
+            days = int(input("请输入需要租赁的天数："))
+            if days > 5:
+                cost = car.calc_rent(days, discount=0.8)
+            elif days > 3:
+                cost = car.calc_rent(days, discount=0.9)
+            else:
+                cost = car.calc_rent(days)
+
+            print(f"租赁{days}天，总共需要花费：{cost}元")
+            print("恭喜，租赁成功！")
+
+    # 还车
+    def return_car(self):
+        carid = input("请输入车辆编号：")
+        if self.cars.get(carid):
+            car = self.cars[carid]
+            if carid // 10000 == 1:
+                self.stocks["Economy"].append(car)
+            if carid // 10000 == 2:
+                self.stocks["Luxury"].append(car)
+            if carid // 10000 == 3:
+                self.stocks["Sport"].append(car)
+            if carid // 10000 == 4:
+                self.stocks["SUV"].append(car)
+            print("恭喜，还车成功!")
+
+def main():
+    car_op = CarOperation()
+    car_op.operate()
+
+if __name__ == "__main__":
+    main()
+
+```
+
+
+
+## 16.8 
