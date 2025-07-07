@@ -7411,4 +7411,1195 @@ if __name__ == "__main__":
 
 
 
-## 16.8 
+## 16.8 内置默认方法
+
+### 内置默认方法基础
+
+```python
+# 内置默认方法基础
+# __new__(cls[, ...]) 创建对象时第一个调用，返回 self  cls:类  作用于不可变量
+class CapStr(str):
+    def __new__(cls, string):
+        string = string.upper()
+        return super().__new__(cls, string)
+cs = CapStr("FishC")
+print(cs)    # FISHC
+print(cs.lower())    # fishc
+print(cs.capitalize())    # Fishc
+
+# ———————————————————————————————————————————
+# __del__(self):    当类最后一个引用销毁时触发
+class C:
+    def __init__(self):
+        print("我来了~")
+    def __del__(self):
+        print("我走了~")
+c = C()
+# 我来了~
+print("1") # 1
+del c
+# 我走了~ 销毁时触发
+print("2") # 2
+
+c = C()
+# 我来了~
+d = c
+del c # 最后一个引用销毁时触发
+print("3") #3
+# 我走了~    若程序中未销毁，程序运行结束时销毁，垃圾回收机制
+
+# ———————————————————————————————————————————
+# del方法可以通过创建一个该实例的新引用来推迟其销毁（对象的重生）（不建议，上下文环境改变，无法正常工作）
+class D:
+    def __init__(self, name):
+        self.name = name
+    def __del__(self):
+        # 一般不要使用全局变量，会污染命名空间
+        global x
+        x = self
+d = D("tyz")
+print(d, d.name) # <__main__.D object at 0x000001F2DED76F90> tyz
+del d
+print(x, x.name) # <__main__.D object at 0x0000028BF9DB6F90> tyz
+
+class E:
+    def __init__(self, name, func):
+        self.name = name
+        self.func = func
+    def __del__(self):
+        self.func(self)
+# 闭包
+def outer():
+    x = 0
+    def inner(y=None):
+        nonlocal x
+        if y:
+            x = y
+        else:
+            return x
+    return inner
+f = outer()
+e = E("tyz", f)
+del e
+# 销毁时给 func() f=inner(self)赋值，将 self 保存在 x 中，g=f()时调用
+g = f()
+print(g, g.name) # <__main__.E object at 0x00000219DDDF70E0> tyz
+
+# ———————————————————————————————————————————
+# 绕过类的构造函数，创建出它的实例对象
+class C:
+    def __init__(self, x):
+        self.x = x
+c = C.__new__(C)
+print(isinstance(c, C)) # True
+# c.x 不存在，仅创建了实例对象，未初始化
+
+```
+
+
+
+#### 银行账户管理系统
+
+```python
+# 银行账户管理系统
+# a. 创建账户
+# 需要提供姓名和密码（要求密码需要以 MD5 哈希值的形式存储）
+# 银行卡号自动生成
+# 支持预存款
+#
+# b. 删除账户
+# 需要验证卡号、姓名和密码
+#
+# c. 查询余额
+# 需要验证卡号和密码
+#
+# d. 存款
+# 需要验证卡号和密码
+# 输入金额
+#
+# e. 取款
+# 需要验证卡号和密码
+# 输入金额，并检查余额是否足够
+#
+# f. 转账
+# 需验证我方卡号和密码，验证对方卡号是否存在
+# 输入金额，并检查我方余额是否足够
+#
+# 程序输入限制（如用户不按要求输入，必须予以纠正）：
+# 密码必须是 6 位数字
+# 金额必须是非负数
+# 卡号必须是正整数
+#
+# 相关类的实现可以参考下面结构（当然你也可以按照自己的想法去构造）：
+# PasswdMixin（Mixin 类，用于实现与密码相关的功能组件）
+# is_valid() -- 检测密码长度
+# to_md5() -- 将明文密码转换为 MD5 存储
+#
+# Account（基本账户类）
+# confirm_name() -- 确认姓名是否匹配
+# confirm_passwd() -- 确认密码是否匹配
+# withdraw() -- 取款
+# deposit() -- 存款
+# transfer() -- 转账
+# get_balance() -- 查询余额
+#
+# UserManager（账户管理类）
+# check_account() -- 检查账户是否存在及密码是否正确
+# create_account() -- 创建账户
+# delete_account() -- 删除账户
+# get_account() -- 获取账户
+import hashlib
+
+class PasswdMixin:
+    # 检测密码长度
+    def is_valid(self, passwd):
+        while True:
+            if len(passwd) != 6 or not passwd.isdigit():
+                passwd = input("密码需为6位数字，请重新输入：")
+            else:
+                break
+        return passwd
+
+    # 密码转换为 md5 存储
+    def to_md5(self, passwd):
+        passwd = hashlib.md5(passwd.encode("utf-8")).hexdigest()
+        return passwd
+
+class Account(PasswdMixin):
+    def __init__(self, username, password, cardid, balance):
+        self.username = username
+        self.password = password
+        self.cardid = cardid
+        self.balance = balance
+
+    # 确认姓名
+    def confirm_name(self, name):
+        return name == self.username
+
+    # 确认密码
+    def confirm_password(self, password):
+        return password == self.password
+
+    # 取款
+    def withdraw(self, money):
+        if self.balance < money:
+            print(f"您的账户不足{money}元，无法取款")
+        else:
+            self.balance -= money
+            print(f"成功取出{money}元。")
+
+    # 存款
+    def deposit(self, money):
+        self.balance += money
+        print(f"成功存入{money}元")
+
+    # 转账
+    def transfer(self, account, money):
+        if self.balance < money:
+            print(f"您的账户不足{money}元，无法转账")
+        else:
+            self.balance -= money
+            account.balance += money
+            print(f"成功转账{money}元。")
+
+    # 查询余额
+    def get_balance(self):
+        return self.balance
+
+class UserManager(PasswdMixin):
+    def __init__(self):
+        self.accounts = {}
+        self.cardid = 88888888
+
+    # 检测账户密码
+    def check_account(self, cardid, password):
+        if self.accounts.get(cardid):
+            account = self.accounts[cardid]
+            password = account.to_md5(password)
+            if account.confirm_password(password):
+                return True
+            else:
+                print("密码错误，请重新输入：")
+                return False
+        else:
+            print("账户不存在")
+            return False
+
+    # 创建账户
+    def create_account(self, name, password, money=0):
+        password = self.is_valid(password)
+        password = self.to_md5(password)
+        account = Account(name, password, self.cardid, money)
+        self.accounts[self.cardid] = account
+        print(f"创建成功，卡号是：{self.cardid}")
+        self.cardid += 1
+
+    # 删除账户
+    def delete_account(self, cardid, name, password):
+        if self.check_account(cardid, password):
+            account = self.accounts[cardid]
+            if account.confirm_name(name):
+                del self.accounts[cardid]
+                print(f"卡号为：{cardid}的账号已删除已删除")
+            else:
+                print(f"用户名：{name}输入错误")
+
+    def get_account(self, cardid, password, nopassword=False):
+        if nopassword:
+            if self.accounts.get(cardid):
+                account = self.accounts[cardid]
+                return account
+            else:
+                print("该账户不存在")
+                return None
+        else:
+            if self.check_account(cardid, password):
+                return self.accounts[cardid]
+            else:
+                return None
+
+def main():
+    bank = UserManager()
+
+    # 需要获取那些信息
+    def get_msg(cardid=False, name=False, passwd=False):
+        msg = {"cardid":None, "name":None, "passwd":None}
+        if cardid:
+           msg["cardid"] = get_integer_input("请输入卡号：")
+        if name:
+            msg["name"] = input("请输入姓名：")
+        if passwd:
+            msg["password"] = input("请输入密码：")
+        return msg
+
+    # 获取整数
+    def get_integer_input(str):
+        while True:
+            try:
+                num = int(input(str))
+                if num < 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("请输入一个有效的整数！")
+        return num
+
+    # 获取浮点数
+    def get_float_input(str):
+        while True:
+            try:
+                num = float(input(str))
+                if num < 0:
+                    raise ValueError
+                break
+            except ValueError:
+                print("请输入一个有效的数值！")
+        return num
+
+    while True:
+        ins = input("1.创建账户/2.删除账户/3.查询余额/4.存款/5.取款/6.转账/7.退出")
+        if ins == "1":
+            msg = get_msg(cardid=False, name=True, passwd=True)
+            money = get_float_input("请输入预存款：")
+            bank.create_account(msg["name"], msg["password"], round(money, 2))
+
+        elif ins == "2":
+            msg = get_msg(cardid=True, name=True, passwd=True)
+            bank.delete_account(msg["cardid"], msg["name"], msg["password"])
+
+        elif ins == "3":
+            msg = get_msg(cardid=True, name=False, passwd=True)
+            account = bank.get_account(msg["name"], msg["password"])
+            if account:
+                print(f"您的余额是：{account.get_balance()}")
+
+        elif ins == "4":
+            msg = get_msg(cardid=True, name=False, passwd=True)
+            account = bank.get_account(msg["name"], msg["password"])
+            if account:
+                money = get_float_input("请输入金额：")
+                account.deposit(round(money, 2))
+
+        elif ins == "5":
+            msg = get_msg(cardid=True, name=False, passwd=True)
+            account = bank.get_account(msg["name"], msg["password"])
+            if account:
+                money = get_float_input("请输入金额：")
+                account.withdraw(round(money, 2))
+
+        elif ins == "6":
+            msg = get_msg(cardid=True, name=False, passwd=True)
+            account = bank.get_account(msg["name"], msg["password"])
+            if account:
+                target_cardid = get_integer_input("请输入卡号：")
+                target_account = bank.get_account(target_cardid, None, True)
+                if target_account:
+                    money = get_float_input("请输入金额：")
+                    account.transfer(target_account, round(money, 2))
+
+        elif ins == "7":
+            break
+
+        else:
+            print("请输入1~7的数字")
+
+if __name__ == '__main__':
+    main()
+
+```
+
+
+
+### 内置默认方法：运算
+
+```python
+# 内置默认方法：运算
+# bin() 转换为二进制
+# 优先级：增强赋值 > 算数运算 > 反算数运算
+# 算术运算
+# __add()__    加法
+from idlelib.colorizer import prog_group_name_to_tag
+
+
+class S(str):
+    # 自定义重写 __add__ 为字符串长度相加
+    def __add__(self, other):
+        return len(self) + len(other)
+s1 = S("FishC")
+s2 = S("Python")
+print(s1 + s2) # 11
+print(s1.__add__(s2) ) # 11
+print(s1 + "python") # 11
+print("FishC" + s2) # FishCPython
+
+# ——————————————————————————————————————————————————
+# 反算数运算
+# __radd()__    相加时，左右对象属于不同类，且左侧对象没有自定义__add()__方法，
+# 或者其自定义__add()__方法返回 NotImplemented ，那么python就会从右侧对象寻找__radd()__
+# NotImplemented 明确表示 没有实现
+class S1(str):
+    def __add__(self, other):
+        return NotImplemented
+
+class S2(str):
+    def __radd__(self, other):
+        return len(self) + len(other)
+s1 = S1("FishC")
+s2 = S2("Python")
+print(s1 + s2) # 11
+
+
+# ——————————————————————————————————————————————————
+# 增强赋值运算
+# __iadd()__ ++
+class S1(str):
+    def __iadd__(self, other):
+        return len(self) + len(other)
+s1 = S1("FishC")
+s1 += s2
+print(s1, type(s1)) # 11 <class 'int'>
+
+# ——————————————————————————————————————————————————
+# __int()__
+class ZH_INT:
+    def __init__(self, num):
+        self.num = num
+
+    def __int__(self):
+        try:
+            return int(self.num)
+        except ValueError:
+            zh = {"零":0, "一":1, "二":2, "三":3, "四":4, "五":5, "六":6, "七":7, "八":8, "九":9,
+                  "壹":1, "贰":2, "叁":3, "肆":4, "伍":5, "陆":6, "柒":7, "捌":8, "玖":9}
+            result = 0
+
+            for each in self.num:
+                if each in zh:
+                    result += zh[each]
+                else:
+                    result += int(each)
+                result *= 10
+            return result // 10
+n = ZH_INT("五贰零1314")
+print(int(n)) # 5201314
+
+# ——————————————————————————————————————————————————
+import math
+print(0.1 + 0.2 == 0.3 + math.ulp(0.3)) # True
+print(math.pi)
+print(math.tau / 2)
+
+# ——————————————————————————————————————————————————
+# __index()__ 当对象被用于索引值时，或内置的 bin()、hex()、oct() 函数将使用该魔法方法的返回值作为参数；
+class C:
+    def __index__(self):
+        print("拦截")
+        # 以3作为索引值
+        return 3
+c = C()
+s = "FishC"
+print(s[c])
+# 拦截
+# h
+print(int(c))
+# 拦截
+# 3
+print(bin(c))
+# 拦截
+# 0b11
+
+
+
+# ——————————————————————————————————————————————————
+# 算术运算
+# __add__(self, other)    x + y（由运算符左侧的对象 x 触发）    加法运算
+# __sub__(self, other)    x - y（由运算符左侧的对象 x 触发）    减法运算
+# __mul__(self, other)    x * y（由运算符左侧的对象 x 触发）    乘法运算
+# __matmul__(self, other)    x @ y（由运算符左侧的对象 x 触发）    矩阵乘法运算
+# __truediv__(self, other)    x / y（由运算符左侧的对象 x 触发）    真除法运算
+# __floordiv__(self, other)    x // y（由运算符左侧的对象 x 触发）    地板除法运算
+# __mod__(self, other)    x % y（由运算符左侧的对象 x 触发）    求余数运算
+# __divmod__(self, other)    divmod(x, y)（由对象 x 触发）    获取两个数字参数（非复数）的地板除结果和余数
+# __pow__(self, other[, modulo])    x ** y 或 pow(x, y)（由运算符左侧的对象 x 触发）    幂运算
+# __lshift__(self, other)    x << y（由运算符左侧的对象 x 触发）    按位左移运算
+# __rshift__(self, other)    x >> y（由运算符左侧的对象 x 触发）    按位右移运算
+# __and__(self, other)    x & y（由运算符左侧的对象 x 触发）    按位与运算
+# __xor__(self, other)    x ^ y（由运算符左侧的对象 x 触发）    按位异或运算
+# __or__(self, other)    x | y（由运算符左侧的对象 x 触发）    按位或运算
+
+# 反算术运算
+# __radd__(self, other)    x + y（由运算符右侧的对象 y 触发）    加法运算
+# __rsub__(self, other)    x - y（由运算符右侧的对象 y 触发）    减法运算
+# __rmul__(self, other)    x * y（由运算符右侧的对象 y 触发）    乘法运算
+# __rmatmul__(self, other)     x @ y（由运算符右侧的对象 y 触发）    矩阵乘法运算
+# __rtruediv__(self, other)    x / y（由运算符右侧的对象 y 触发）    真除法运算
+# __rfloordiv__(self, other)    x // y（由运算符右侧的对象 y 触发）    地板除法运算
+# __rmod__(self, other)    x % y（由运算符右侧的对象 y 触发）    求余数运算
+# __rdivmod__(self, other)    divmod(x, y)（由对象 y 触发）    获取两个数字参数（非复数）的地板除结果和余数
+# __rpow__(self, other[, modulo])    x ** y 或 pow(x, y)（由运算符右侧的对象 y 触发）    幂运算
+# __rlshift__(self, other)    x << y（由运算符右侧的对象 y 触发）    按位左移运算
+# __rrshift__(self, other)    x >> y（由运算符右侧的对象 y 触发）    按位右移运算
+# __rand__(self, other)    x & y（由运算符右侧的对象 y 触发）    按位与运算 存在0即0
+# __rxor__(self, other)    x ^ y（由运算符右侧的对象 y 触发）    按位异或运算 不同即1
+# __ror__(self, other)    x | y（由运算符右侧的对象 y 触发）    按位或运算 存在1即1
+
+# 增强赋值运算
+# __iadd__(self, other)    x += y（由运算符左侧的对象 x 触发）    加法运算
+# __isub__(self, other)    x -= y（由运算符左侧的对象 x 触发）    减法运算
+# __imul__(self, other)    x *= y（由运算符左侧的对象 x 触发）    乘法运算
+# __imatmul__(self, other)    x @= y（由运算符左侧的对象 x 触发）    矩阵乘法运算
+# __itruediv__(self, other)    x /= y（由运算符左侧的对象 x 触发）    真除法运算
+# __ifloordiv__(self, other)    x //= y（由运算符左侧的对象 x 触发）    地板除法运算
+# __imod__(self, other)    x %= y（由运算符左侧的对象 x 触发）    求余数运算
+# __ipow__(self, other[, modulo])    x **= y（由运算符左侧的对象 x 触发）    幂运算
+# __ilshift__(self, other)    x <<= y（由运算符左侧的对象 x 触发）    按位左移运算
+# __irshift__(self, other)    x >>= y（由运算符左侧的对象 x 触发）    按位右移运算
+# __iand__(self, other)    x &= y（由运算符左侧的对象 x 触发）    按位与运算
+# __ixor__(self, other)    x ^= y（由运算符左侧的对象 x 触发）    按位异或运算
+# __ior__(self, other)    x |= y（由运算符左侧的对象 x 触发）    按位或运算
+
+# 一元运算
+# __neg__(self)    -x    取相反数运算
+# __pos__(self)    +x    正数运算
+# __abs__(self)    abs(x)    取绝对值
+# __invert__(self)    ~x    按位非（按位取反）运算
+
+# 其他运算
+# __complex__(self)    complex(x)
+# __int__(self)    int(x)
+# __float__(self)    float(x)
+#  __index__(self)    index(x)    当对象被用于索引值时，或内置的 bin()、hex()、oct() 函数将使用该魔法方法的返回值作为参数；
+# 如果没有定义 __complex__()、__int__()、__float__()，则相应的 complex()、int()、float() 函数将使用该魔法方法的返回值作为参数
+# __round__(self[, ndigits])    round(x)
+# __trunc__(self)    math.trunc(x)
+# __floor__(self)    math.floor(x)
+# __ceil__(self)     math.ceil(x)
+
+```
+
+
+
+#### 自定义int,float
+
+```python
+# 自定义int,float
+# 支持中文数字，及浮点数
+from string import digits
+
+class ZH_INT:
+    def __init__(self, num):
+        self.num = num
+
+    def __int__(self):
+        try:
+            return int(self.num)
+        except ValueError:
+            units = {"十": 10, "拾": 10, "百": 100, "佰": 100, "千": 1000, "仟": 1000,
+                     "万": 10000, "萬": 10000, "亿": 100000000, "億": 100000000}
+            digits = {"零": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6,
+                      "七": 7, "八": 8, "九": 9, "壹": 1, "贰": 2, "叁": 3, "肆": 4,
+                      "伍": 5, "陆": 6, "柒": 7, "捌": 8, "玖": 9, "两": 2}
+
+            unit = 0  # 初始单位
+            section = []  # 存放字符串拆解后的数据片段
+            temp = 0  # 临时变量
+
+            for i in range(len(self.num)-1, -1, -1):
+                char = self.num[i]
+                if char in units:
+                    unit = units[char]
+                    # 万和亿需要单独存储，因为需要考虑处理一百万，十亿这类重复单位的数字
+                    if unit == 10000 or unit == 100000000:
+                        section.append(unit)
+                        units = 1
+                elif char in digits:
+                    temp = digits[char]
+                    # 如果有单位，则乘以单位代表的数值
+                    if unit:
+                        temp *= unit
+                        unit = 0
+                    section.append(temp)
+                else:
+                    raise ValueError(f"[{char}]是无效字符。")
+
+            # “十”要单独处理，因为我们不会说“一十五”，而是习惯直接说“十五”
+            # 而对于百、千、万，我们会说是“一百”，“一千”或者“一百万”
+            if unit == 10:
+                section.append(10)
+
+            # 接下来将数据片段拼接起来即可
+            result = 0
+            temp = 0
+
+            for each in reversed(section):
+                if each == 10000 or each == 100000000:
+                    result += temp * each
+                    temp = 0
+                else:
+                    temp += each
+            result += temp
+
+            return result
+
+
+class ZH_FLOAT:
+    def __init__(self, num):
+        self.num = num
+
+    def __float__(self):
+        units = {"十": 10, "拾": 10, "百": 100, "佰": 100, "千": 1000, "仟": 1000,
+                 "万": 10000, "萬": 10000, "亿": 100000000, "億": 100000000}
+        digits = {"零": 0, "一": 1, "二": 2, "三": 3, "四": 4, "五": 5, "六": 6,
+                  "七": 7, "八": 8, "九": 9, "壹": 1, "贰": 2, "叁": 3, "肆": 4,
+                  "伍": 5, "陆": 6, "柒": 7, "捌": 8, "玖": 9, "两": 2}
+
+        # 处理整数部分
+        def process_integer_part(n):
+            unit = 0  # 初始单位
+            section = []  # 存放字符串拆解后的数据片段
+            temp = 0  # 临时变量
+
+            for i in range(len(n) - 1, -1, -1):
+                char = n[i]
+                if char in units:
+                    unit = units[char]
+                    # 万和亿需要单独存储，因为需要考虑处理一百万，十亿这类重复单位的数字
+                    if unit == 10000 or unit == 100000000:
+                        section.append(unit)
+                        unit = 1
+                elif char in digits:
+                    temp = digits[char]
+                    # 如果有单位，则乘以单位代表的数值
+                    if unit:
+                        temp *= unit
+                        unit = 0
+                    section.append(temp)
+                else:
+                    raise ValueError(f"[{char}]是无效字符。")
+
+            # “十”要单独处理，因为我们不会说“一十五”，而是习惯直接说“十五”
+            # 而对于百、千、万，我们会说是“一百”，“一千”或者“一百万”
+            if unit == 10:
+                section.append(10)
+
+            # 接下来将数据片段拼接起来即可
+            result = 0
+            temp = 0
+
+            for each in reversed(section):
+                if each == 10000 or each == 100000000:
+                    result += temp * each
+                    temp = 0
+                else:
+                    temp += each
+
+            result += temp
+            return result
+
+        # 处理小数部分
+        def process_decimal_part(d):
+            result = 0
+            # 0.2 = 2 * 10**(-1)
+            # 0.25 = 2 * 10**(-1) + 5 * 10**(-2)
+            # ...
+            for i, char in enumerate(d):
+                if char in digits:
+                    result += digits[char] * (10 ** (i + 1))
+                else:
+                    try:
+                        result += int(char) * (10 ** (i + 1))
+                    except ValueError:
+                        raise ValueError(f"[{char}]是无效字符。")
+
+            return result
+
+        try:
+            return float(self.num)
+        except ValueError:
+            if "点" in self.num:
+                integer_part, decimal_part = self.num.split("点", 1)
+            elif "點" in self.num:
+                integer_part, decimal_part = self.num.split("點", 1)
+            else:
+                # 如果没有小数点则直接当作整数处理完返回
+                return process_integer_part(self.num)
+
+            integer_result = process_integer_part(integer_part)
+            decimal_result = process_decimal_part(decimal_part)
+
+            return float(integer_result + decimal_result)
+
+```
+
+
+
+#### 自定义 一进制 与 电影票订购系统
+
+```python
+# 自定义 一进制 与 电影票订购系统
+# 重载加（+）、减（-）、乘（*）、除（/）、地板除（//）五个运算符（为了简化实现逻辑，我们约定无论除法还是地板除，都统一采用地板除，即不考虑小数位）
+from warnings import resetwarnings
+
+
+class UnaryNumber:
+    def __init__(self, value):
+        self.value = value
+
+    def __str__(self):
+        if self.value < 0:
+            return '-' + '1' * abs(self.value)
+        elif self.value == 0:
+            return "没有"
+        else:
+            return '1' * self.value
+
+    def __int__(self):
+        return self.value
+
+    def __add__(self, other):
+        if isinstance(other, UnaryNumber):
+            return UnaryNumber(self.value + other.value)
+        else:
+            raise ValueError("类型不同无法相加")
+
+    def __sub__(self, other):
+        if isinstance(other, UnaryNumber):
+            return UnaryNumber(self.value - other.value)
+        else:
+            raise ValueError("类型不同无法相减")
+
+    def __mul__(self, other):
+        if isinstance(other, UnaryNumber):
+            return UnaryNumber(self.value * other.value)
+        else:
+            raise ValueError("类型不同无法相乘")
+
+    def __truediv__(self, other):
+        if isinstance(other, UnaryNumber):
+            if other.value != 0:
+                return UnaryNumber(self.value // other.value)
+            else:
+                raise ValueError("除数不能为0")
+        else:
+            raise ValueError("类型不同无法相除")
+
+    def __floordiv__(self, other):
+        if isinstance(other, UnaryNumber):
+            if other.value != 0:
+                return UnaryNumber(self.value // other.value)
+            else:
+                raise ValueError("除数不能为0")
+        else:
+            raise ValueError("类型不同无法相除")
+
+x = UnaryNumber(3)
+y = UnaryNumber(5)
+print(x, y) # 111 11111
+print(x + y) # 11111111
+print(x * y) # 111111111111111
+print(x // y) # 没有
+
+
+# ——————————————————————————————————————————————————
+# 电影票订购系统
+# 需要实现的功能：
+# 查看信息
+# 预订座位
+# 查看预订
+#
+# 推荐实现方案（当然你也可以按照自己的思路来定义）：
+# a. 电影院（Cinema）：用于管理电影的添加和信息呈现
+# 添加电影和播放时间（add_movie）
+# 显示所有电影及其播放时间（show_movies）
+#
+# b. 座位（Seat）：用于管理座位
+# 管理座位是否被预定（reserve）
+#
+# c. 预订系统（MovieBookingSystem）：用于管理预定信息
+# 预定座位操作（reserve_seat）
+# 查看预订信息（view_reservation）
+
+# 定义电影类
+class Cinema:
+    def __init__(self, movie_name):
+        self.movie_name = movie_name
+        self.movies = {}
+
+    # 添加电影名，电影时间
+    def add_movie(self, movie_name, schedule):
+        self.movies[movie_name] = schedule
+
+    #  展示电影时间
+    def show_movies(self):
+        for movie_name, schedule in self.movies.items():
+            print(f"{movie_name}")
+            for date, times in schedule:
+                print(f"{date}: {', '.join(times)}")
+
+# 定义座位类
+class Seat:
+    def __init__(self, row, number):
+        self.row = row          # 座位所在的排数
+        self.number = number    # 座位号
+        self.reserved = False   # 标志一个座位是否被预定
+
+    # 预定座位
+    def reserve(self):
+        if not self.reserved:
+            self.reserved = True
+        else:
+            raise ValueError("该座位已被预定。")
+
+class MovieBookingSystem:
+    def __init__(self, cinema, rows, seats_per_row):
+        self.cinema = cinema
+        self.reservations = {}  # 存储预订信息的字典
+
+        # 创建座位实例并存储到字典中
+        self.seats = {f"{row + 1}-{seat + 1}": Seat(row + 1, seat + 1) for row in range(rows) for seat in range(seats_per_row)}
+
+    # 预订座位
+    def reserve_seat(self, movie_name, date, time, seat_id):
+        key = (movie_name, date, time)
+        seat = self.seats.get(seat_id)
+
+        # 如果位置不存在抛出异常
+        if not seat:
+            raise ValueError("无效的座位号")
+
+        # 如果预订信息不存在，创建新的预订信息
+        if key not in self.reservations:
+            self.reservations[key] = []
+
+        # 如果座位未被预定，预定座位并添加到预定信息
+        if seat not in self.reservations[key]:
+            seat.reserve()
+            self.reservations[key].append(seat)
+        else:
+            raise ValueError("该座位已被预定。")
+
+    # 查看座位信息
+    def view_reservation(self, movie_name, date, time):
+        key = (movie_name, date, time)
+        return self.reservations.get(key, [])
+
+def dispaly_menu():
+    print("欢迎来到电影票订购系统")
+    print("1. 查看电影")
+    print("2. 预订座位")
+    print("3. 查看预订")
+    print("4. 退出系统")
+
+# 获取用户输入
+def user_input(prompt):
+    try:
+        return input(prompt)
+    except KeyboardInterrupt:
+        print("\n谢谢使用！")
+        exit(0)
+
+def main():
+    # 创建电影院实例并添加电影
+    cinema = Cinema("鱼C影院")
+    cinema.add_movie("《小甲鱼的救赎》", {"2023-07-20": ["14:00", "18:00"]})
+    cinema.add_movie("《不二如是的假日》", {"2023-07-20": ["16:00", "20:00"]})
+
+    # 创建预定实例
+    booking_system = MovieBookingSystem(cinema, 10, 10)
+
+    while True:
+        dispaly_menu()
+        choice = user_input("请输入操作指令：")
+
+        # 查看电影
+        if choice == "1":
+            print("电影时间表 >>>")
+            cinema.show_movies()
+
+        # 预定座位
+        elif choice == "2":
+            movie_name = user_input("请输入电影名称")
+            data = user_input("请输入日期（年-月-日）：")
+            time = user_input("请输入时间（时：分）：")
+            seat_id = user_input("请输入座位号（排数-座位号）")
+
+            try:
+                booking_system.reserve_seat(movie_name, data, time, seat_id)
+                print("预定成功！\n")
+            except ValueError as e:
+                print(f"预定失败：{e}\n")
+
+        # 查看预定
+        elif choice == "3":
+            movie_name = user_input("请输入电影名称")
+            data = user_input("请输入日期（年-月-日）：")
+            time = user_input("请输入时间（时：分）：")
+
+            reserved_seat = booking_system.view_reservation(movie_name, data, time)
+            if reserved_seat:
+                print("预定的座位：")
+                for seat in reserved_seat:
+                    print(f"{seat.row}排，{seat.number}号")
+            else:
+                print("没有预定的座位。")
+            print()
+
+        # 退出系统
+        elif choice == "4":
+            print("谢谢使用！")
+            break
+
+        # 无效选择处理
+        else:
+            print("无效选择，请输入1~4之间的数字。\n")
+
+if __name__ == "__main__":
+    main()
+
+```
+
+
+
+### 内置属性方法
+
+```python
+# 内置属性方法
+# hasattr(ob, str) 是否有 str 这个属性
+# getattr(ob, str) 获取 str 这个属性  __getattribute__()
+# __getattr__() 当获取不存在的属性时触发
+# setattr(ob, str) 给 str 这个属性赋值 __setattr__()
+# delattr(ob, str) 删除 str这个属性 __delattr__()
+class C:
+    def __init__(self, name, age):
+        self.name = name
+        self.__age = age # __age 私有变量
+
+c = C("小甲鱼", 18)
+print(hasattr(c, "name")) # True
+print(getattr(c, "name")) # 小甲鱼
+print(getattr(c, "_C__age")) # 18
+setattr(c, "_C__age", 19)
+print(getattr(c, "_C__age")) # 19
+delattr(c, "_C__age")
+print(hasattr(c, "_C__age")) # False
+
+# ——————————————————————————————————————————————————————
+# __getattribute__()
+class C:
+    def __init__(self, name, age):
+        self.name = name
+        self.__age = age
+
+    def __getattribute__(self, attrname):
+        print("截取")
+        return super().__getattribute__(attrname)
+
+c = C("小甲鱼", 18)
+print(getattr(c, "name"))
+# 截取
+# 小甲鱼
+
+# ——————————————————————————————————————————————————————
+# __getattr__() 当获取对象不存在时触发
+class C:
+    def __init__(self, name, age):
+        self.name = name
+        self.__age = age
+
+    def __getattribute__(self, attrname):
+        print("截取")
+        return super().__getattribute__(attrname)
+
+    def __getattr__(self, attrname):
+        if attrname == "FishC":
+            print("I love FishC")
+        else:
+            raise AttributeError(attrname)
+c = C("小甲鱼", 18)
+print(c.FishC)
+# 截取
+# I love FishC
+# None
+print(c.name)
+# 截取
+# 小甲鱼
+
+# ——————————————————————————————————————————————————————
+# __setattr__()
+class D:
+    def __setattr__(self, name, value):
+        self.__dict__[name] = value
+d = D()
+d.name = "小甲鱼"
+print(d.name) # 小甲鱼
+
+class D:
+    def __setattr__(self, name, value):
+        return super().__setattr__(name, value)
+d = D()
+d.name = "小甲鱼"
+print(d.name) # 小甲鱼
+
+# ——————————————————————————————————————————————————————
+# __delattr__()
+class D:
+    def __setattr__(self, name, value):
+        self.__dict__[name] = value
+    def __delattr__(self, name):
+        del self.__dict__[name]
+d = D()
+d.name = "小甲鱼"
+del d.name
+print(d.__dict__) # {}
+
+```
+
+
+
+#### 文件管理类
+
+```python
+# 文件管理类
+# 定义一个名为 FileManager 的类，该类可以实现简单的文件管理功能，包括浏览目录、创建文件、重命名文件和删除文件。
+# 提示：调用 pathlib 模块中的一些方法，来实现你目前不知道如何实现的文件管理操作
+from pathlib import Path
+class FileManager:
+    def __init__(self, path=r"D:\临时\test"):
+        self.path = Path(path)
+
+    def __getattr__(self, attr):
+        if attr in self.__dict__:
+            return getattr(self, attr)
+        else:
+            raise AttributeError(f"{self.__class__.__name__} 对象没有 '{attr}' 属性")
+
+    def __setattr__(self, attr, value):
+        if attr == "path":
+            object.__setattr__(self, attr, value)
+        else:
+            setattr(self, attr, value)
+
+    def __delattr__(self, attr):
+        if hasattr(self, attr):
+            object.__delattr__(self, attr)
+        else:
+            raise AttributeError(f"{self.__class__.__name__} 对象没有 '{attr}' 属性")
+
+
+    def browse(self):
+        for i in self.path.iterdir():
+            print(i.name)
+
+    def create(self, path):
+        n = self.path / path
+        if not n.exists():
+            n.touch()
+        else:
+            print(f"文件 '{n}' 已存在。")
+
+    def rename(self, old_path, new_path):
+        old_path = self.path / old_path
+        new_path = self.path / new_path
+        if old_path.exists() and not new_path.exists():
+            old_path.rename(new_path)
+        else:
+            print(f"错误：'{old_path}' 不存在或 '{new_path}' 已存在。")
+
+    def delete(self, file_path):
+        file_path = self.path / file_path
+        if file_path.is_file():
+            file_path.unlink()
+        elif file_path.is_dir():
+            for i in file_path.glob("*"):
+                self.delete(i.relative_to(self.path))
+            file_path.remove(file_path)
+        else:
+            print(f"文件 '{file_path}' 未找到。")
+
+fm = FileManager()
+fm.browse()
+fm.create("test.txt")
+fm.browse()
+
+from pathlib import Path
+
+class FileManager:
+    def __init__(self, path="."):
+        self.path = Path(path)
+
+    def __getattr__(self, attr):
+        if attr == 'size':
+            return self.get_size()
+        else:
+            raise AttributeError(f"{self.__class__.__name__} 对象没有 '{attr}' 属性")
+
+    def __setattr__(self, attr, value):
+        if attr == "path":
+            object.__setattr__(self, attr, Path(value))
+        else:
+            object.__setattr__(self, attr, value)
+
+    def __delattr__(self, attr):
+        if hasattr(self, attr):
+            object.__delattr__(self, attr)
+        else:
+            raise AttributeError(f"{self.__class__.__name__} 对象没有 '{attr}' 属性")
+
+    def get_size(self, file_name=None):
+        if file_name:
+            file_path = self.path / file_name
+            if file_path.is_file():
+                return file_path.stat().st_size
+            else:
+                raise FileNotFoundError(f"文件 '{file_name}' 未找到。")
+        else:
+            total_size = 0
+            for entry in self.path.glob('**/*'):
+                if entry.is_file():
+                    total_size += entry.stat().st_size
+            return total_size
+
+    def browse(self, recursive=False, sort_by=None, reverse=False):
+        try:
+            if recursive:
+                for entry in sorted(self.path.glob('**/*'), key=sort_by, reverse=reverse):
+                    print(entry.relative_to(self.path))
+            else:
+                for entry in sorted(self.path.iterdir(), key=sort_by, reverse=reverse):
+                    print(entry.name)
+        except Exception as e:
+            print(f"浏览文件时出错: {e}")
+
+    def create_file(self, file_name):
+        try:
+            file_path = self.path / file_name
+            if not file_path.exists():
+                file_path.touch()
+            else:
+                print(f"文件 '{file_name}' 已存在。")
+        except Exception as e:
+            print(f"创建文件时出错: {e}")
+
+    def create_directory(self, dir_name):
+        try:
+            dir_path = self.path / dir_name
+            if not dir_path.exists():
+                dir_path.mkdir(parents=True)
+            else:
+                print(f"文件夹 '{dir_name}' 已存在。")
+        except Exception as e:
+            print(f"创建文件夹时出错: {e}")
+
+    def delete(self, file_name):
+        try:
+            file_path = self.path / file_name
+            if file_path.is_file():
+                file_path.unlink()
+            elif file_path.is_dir():
+                for child in file_path.glob('*'):
+                    self.delete(child.relative_to(self.path))
+                file_path.rmdir()
+            else:
+                print(f"文件 '{file_name}' 未找到。")
+        except Exception as e:
+            print(f"删除文件时出错: {e}")
+
+    def rename(self, old_name, new_name):
+        try:
+            old_path = self.path / old_name
+            new_path = self.path / new_name
+            if old_path.exists() and not new_path.exists():
+                old_path.rename(new_path)
+            else:
+                print(f"错误: '{old_name}' 未找到 或 '{new_name}' 已存在。")
+        except Exception as e:
+            print(f"重命名文件时时出错: {e}")
+
+    def search(self, pattern):
+        try:
+            for entry in self.path.glob(f"**/{pattern}"):
+                print(entry.relative_to(self.path))
+        except Exception as e:
+            print(f"搜索文件时出错: {e}")
+
+
+def main():
+    fm = FileManager()
+    while True:
+        try:
+            command = input("输入命令（1.浏览/2.创建文件/3.创建文件夹/4.删除/5.重命名/6.搜索/7.退出）：")
+            if command == "1":
+                recursive = input("递归浏览? (y/n): ").lower() == "y"
+                fm.browse(recursive=recursive)
+            elif command == "2":
+                file_name = input("输入文件名: ")
+                fm.create_file(file_name)
+            elif command == "3":
+                dir_name = input("输入文件夹名: ")
+                fm.create_directory(dir_name)
+            elif command == "4":
+                file_name = input("输入文件或文件夹名: ")
+                fm.delete(file_name)
+            elif command == "5":
+                old_name = input("输入旧文件或文件夹名: ")
+                new_name = input("输入新文件或文件夹名: ")
+                fm.rename(old_name, new_name)
+            elif command == "6":
+                pattern = input("输入搜索模式: ")
+                fm.search(pattern)
+            elif command == "7":
+                break
+            else:
+                print("无效命令，请重试。")
+        except KeyboardInterrupt:
+            print("中断。退出。")
+            break
+        except Exception as e:
+            print(f"错误: {e}")
+
+main()
+
+```
+
+
+
