@@ -8603,3 +8603,1380 @@ main()
 
 
 
+## 16.9 索引，切片，迭代协议
+
+```python
+# 索引，切片，迭代协议
+# 索引：当被索引时，调用 __getitem__(self, index) 支持单下标，还支持切片     相关的获取操作都会被拦截
+# 为索引或切片赋值时，调用 __setitem__(self, index， value)
+# ——————————————————————————————————————————————————————————
+# __getitem__(self, index)
+class C:
+    def __getitem__(self, index):
+        print(index)
+c = C()
+c[2] # 2
+c[2:8] # slice(2, 8, None) slice内置BIF，切片调用
+
+s = "I love FishC"
+print(s[2:6]) # love
+print(s[slice(2, 6)]) # love
+print(s[7:]) # FishC
+print(s[slice(7, None)]) # FishC
+print(s[::4]) # Ivi
+print(s[slice(None, None, 4)]) # Ivi
+
+# ——————————————————————————————————————————————————————————
+# __setitem__(self, index， value)
+class D():
+    def __init__(self, data):
+        self.data = data
+    def __getitem__(self, index):
+        return self.data[index]
+    def __setitem__(self, index, value):
+        self.data[index] = value
+d = D([1, 2, 3, 4, 5])
+print(d[1]) # 2
+d[1] = 1
+print(d[1]) # 1
+d[2:4] = [2, 3]
+print(d[:]) # [1, 1, 2, 3, 5]
+
+# ——————————————————————————————————————————————————————————
+# __getitem__也能拦截for语句
+class D():
+    def __init__(self, data):
+        self.data = data
+    def __getitem__(self, index):
+        return self.data[index] * 2
+d = D([1, 2, 3, 4, 5])
+for i in d:
+    print(i, end=" ") # 2 4 6 8 10
+print()
+
+# ——————————————————————————————————————————————————————————
+# for 语句真正的拦截语句：__iter__(self) __next__(self)
+# 可迭代对象都有__iter__()方法，调用它会变成迭代器，可以使用 next 方法
+# for 语句做的第一步操作，是将对象传入内置函数 iter() 中，并由此拿到一个相应的迭代器。
+# 因为只有拿到这个迭代器，才能拥有所需的 __next__() 方法。
+# 第二步就是利用 __next__() 方法进行真正的迭代操作
+x = [1, 2, 3, 4, 5]
+for i in x:
+    print(i, end=" ") # 1 2 3 4 5
+print()
+# 相当于：
+_ = iter(x)
+while True:
+    try:
+        i = _.__next__()
+    except StopIteration:
+        break
+    print(i, end=" ") # 1 2 3 4 5
+print()
+
+# ——————————————————————————————————————————————————————————
+# 迭代器类
+class Double:
+    def __init__(self, start, stop):
+        self.value = start - 1
+        self.stop = stop
+    def __iter__(self):
+        return self
+    def __next__(self):
+        if self.value == self.stop:
+            raise StopIteration
+        self.value += 1
+        return self.value * 2
+d = Double(1, 5)
+for i in d:
+    print(i, end=" ") # 2 4 6 8 10
+print()
+
+matrix = [[1, 2, 3, 4, 5],
+          [6, 7, 8, 9, 10],
+          [11, 12, 13, 14, 15],
+          [16, 17, 18, 19, 20],
+          [21, 22, 23, 24, 25]]
+
+# 创建两个 slice 对象
+rows = slice(1, 4) # 空白一：对应于切片操作 [1:4]
+cols = slice(2, None) # 空白二：对应于切片操作 [2:]
+
+# 使用切片操作获取子矩阵
+sub_matrix1 = [row[cols] for row in matrix[rows]]
+# 使用 slice 对象获取子矩阵
+sub_matrix2 = [row.__getitem__(cols) for row in matrix.__getitem__(rows)]
+
+print(sub_matrix1)
+print(sub_matrix2)
+
+```
+
+
+
+### 生成随机链接
+
+```python
+# 生成随机链接
+import string
+import random
+
+class ShortURL:
+    def __init__(self):
+        self.url_dict = {}  # 存储短链接和长链接的对应关系
+        self.click_dict = {}  # 存储短链接的点击次数
+        self.long_to_short = {}  # 存储长链接到短链接的映射
+
+    def __getitem__(self, short_url):
+        # 当短链接被访问时，增加其点击次数，并返回对应的长链接
+        if short_url in self.url_dict:
+            self.click_dict[short_url] = self.click_dict.get(short_url, 0) + 1
+            return self.url_dict[short_url]
+        raise KeyError(f"短链接（{short_url}）不存在")
+
+    def __setitem__(self, short_url, long_url):
+        # 存储长链接和短链接的对应关系
+        self.url_dict[short_url] = long_url
+
+    def __iter__(self):
+        # 生成_keys和_current_key_index，为下方迭代器做准备
+        self._keys = list(self.url_dict.keys())
+        self._current_key_index = 0
+        return self
+
+    def __next__(self):
+        # 实现迭代操作的细节，这样for语句就是找到怎么找到下一个元素了
+        if self._current_key_index < len(self._keys):
+            short_url = self._keys[self._current_key_index]
+            long_url = self.url_dict[short_url]
+            self._current_key_index += 1
+            return (short_url, long_url)
+        raise StopIteration
+
+    def generate_short_url(self, long_url):
+        # 如果长链接已存在，直接返回对应的短链接；否则，生成新的短链接
+        if long_url in self.long_to_short:
+            return self.long_to_short[long_url]
+
+        while True:
+            # 生成一个随机的短链接，长度为8
+            short_url = ''.join(random.choices(string.ascii_letters + string.digits, k=8))
+            if short_url not in self.url_dict:
+                break
+
+        self.long_to_short[long_url] = short_url  # 存储长链接和新的短链接的对应关系
+        return short_url
+
+    def get_clicks(self, short_url):
+        # 返回短链接的点击次数，如果短链接不存在，返回0
+        return self.click_dict.get(short_url, 0)
+
+
+def main():
+    url_gen = ShortURL()
+
+    long_url1 = "https://fishc.com.cn/forum-173-1.html"
+    short_url1 = url_gen.generate_short_url(long_url1)
+    url_gen[short_url1] = long_url1
+
+    long_url2 = "https://fishc.com.cn/forum-360-1.html"
+    short_url2 = url_gen.generate_short_url(long_url2)
+    url_gen[short_url2] = long_url2
+
+    long_url3 = "https://fishc.com.cn/thread-216104-1-1.html"
+    short_url3 = url_gen.generate_short_url(long_url3)
+    url_gen[short_url3] = long_url3
+
+    for short_url, long_url in url_gen:
+        print(f"短链接：{short_url} -> 长链接：{long_url}")
+
+
+if __name__ == "__main__":
+    main()
+
+```
+
+
+
+## 16.10 代偿
+
+```python
+# 代偿
+# 该部分无法工作，其他部分代替它来工作
+# __contains__(self, item) 实现成员关系的检测 对应运算符：in/not in
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __contains__(self, item):
+        print("嗨~", end=" ")
+        return item in self.data
+c = C([1, 2, 3, 4, 5])
+print(3 in c) # 嗨~ True
+print(6 in c) # 嗨~ False
+
+# ————————————————————————————————————————————————————————————
+# 使用in/not in时，会调用__contains__(self, item)，若无则找__iter__和__next__，若仍无则找__getitem__()
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __iter__(self):
+        print("iter", end="->")
+        self.i = 0
+        return self
+    def __next__(self):
+        print("next", end="->")
+        if self.i == len(self.data):
+            raise StopIteration
+        item = self.data[self.i]
+        self.i += 1
+        return item
+c = C([1, 2, 3, 4, 5])
+print(3 in c) # iter->next->next->next->True
+print(6 in c) # iter->next->next->next->next->next->next->False
+
+# ————————————————————————————————————————————————————————————
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __getitem__(self, index):
+        print("getitem", end="->")
+        return self.data[index]
+c = C([1, 2, 3, 4, 5])
+print(3 in c) # getitem->getitem->getitem->True
+print(6 in c) # getitem->getitem->getitem->getitem->getitem->getitem->False
+
+# ————————————————————————————————————————————————————————————
+# 布尔测试
+# 遇到bool() 会先找 __bool__() ，若无则找 __len__()(返回值不为0，则为True)
+class D:
+    def __bool__(self):
+        print("Bool", end="->")
+        return True
+d = D()
+print(bool(d)) # Bool->True
+
+class D:
+    def __init__(self, data):
+        self.data = data
+    def __len__(self):
+        print("len", end="->")
+        return len(self.data)
+d = D("FishC")
+print(bool(d)) # len->True
+
+# ————————————————————————————————————————————————————————————
+# 比较方法魔法方法（magic method）
+# < __lt__(self, other)
+# <= __le__(self, other)
+# > __gt__(self, other)
+# >= __ge__(self, other)
+# == __eq__(self, other)
+# != __ne__(self, other)
+class S(str):
+    def __lt__(self, other):
+        return len(self) < len(other)
+    def __gt__(self, other):
+        return len(self) > len(other)
+    def __eq__(self, other):
+        return len(self) == len(other)
+s1 = S("FishC")
+s2 = S("fishc")
+print(s1 < s2) # False
+print(s1 > s2) # False
+print(s1 == s2) # True
+
+# ————————————————————————————————————————————————————————————
+# 希望某个方法魔法方法不生效时，设置为None
+class S(str):
+    def __lt__(self, other):
+        return len(self) < len(other)
+    def __gt__(self, other):
+        return len(self) > len(other)
+    def __eq__(self, other):
+        return len(self) == len(other)
+    __le__ = None
+    __ge__ = None
+    __ne__ = None
+s1 = S("FishC")
+s2 = S("fishc")
+# print(s1 <= s2) # 报错
+
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __iter__(self):
+        print("iter", end="->")
+        self.i = 0
+        return self
+    def __next__(self):
+        print("next", end="->")
+        if self.i == len(self.data):
+            raise StopIteration
+        item = self.data[self.i]
+        self.i += 1
+        return item
+    __contains__ = None
+c = C([1, 2, 3, 4, 5])
+# print(3 in c) # 阻止了__contains__后明确不希望检测成员关系，直接报错，不会再继续往后寻找代偿方法
+
+```
+
+
+
+### 学生成绩管理
+
+```python
+# 代偿
+# 该部分无法工作，其他部分代替它来工作
+# __contains__(self, item) 实现成员关系的检测 对应运算符：in/not in
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __contains__(self, item):
+        print("嗨~", end=" ")
+        return item in self.data
+c = C([1, 2, 3, 4, 5])
+print(3 in c) # 嗨~ True
+print(6 in c) # 嗨~ False
+
+# ————————————————————————————————————————————————————————————
+# 使用in/not in时，会调用__contains__(self, item)，若无则找__iter__和__next__，若仍无则找__getitem__()
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __iter__(self):
+        print("iter", end="->")
+        self.i = 0
+        return self
+    def __next__(self):
+        print("next", end="->")
+        if self.i == len(self.data):
+            raise StopIteration
+        item = self.data[self.i]
+        self.i += 1
+        return item
+c = C([1, 2, 3, 4, 5])
+print(3 in c) # iter->next->next->next->True
+print(6 in c) # iter->next->next->next->next->next->next->False
+
+# ————————————————————————————————————————————————————————————
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __getitem__(self, index):
+        print("getitem", end="->")
+        return self.data[index]
+c = C([1, 2, 3, 4, 5])
+print(3 in c) # getitem->getitem->getitem->True
+print(6 in c) # getitem->getitem->getitem->getitem->getitem->getitem->False
+
+# ————————————————————————————————————————————————————————————
+# 布尔测试
+# 遇到bool() 会先找 __bool__() ，若无则找 __len__()(返回值不为0，则为True)
+class D:
+    def __bool__(self):
+        print("Bool", end="->")
+        return True
+d = D()
+print(bool(d)) # Bool->True
+
+class D:
+    def __init__(self, data):
+        self.data = data
+    def __len__(self):
+        print("len", end="->")
+        return len(self.data)
+d = D("FishC")
+print(bool(d)) # len->True
+
+# ————————————————————————————————————————————————————————————
+# 比较方法魔法方法（magic method）
+# < __lt__(self, other)
+# <= __le__(self, other)
+# > __gt__(self, other)
+# >= __ge__(self, other)
+# == __eq__(self, other)
+# != __ne__(self, other)
+class S(str):
+    def __lt__(self, other):
+        return len(self) < len(other)
+    def __gt__(self, other):
+        return len(self) > len(other)
+    def __eq__(self, other):
+        return len(self) == len(other)
+s1 = S("FishC")
+s2 = S("fishc")
+print(s1 < s2) # False
+print(s1 > s2) # False
+print(s1 == s2) # True
+
+# ————————————————————————————————————————————————————————————
+# 希望某个方法魔法方法不生效时，设置为None
+class S(str):
+    def __lt__(self, other):
+        return len(self) < len(other)
+    def __gt__(self, other):
+        return len(self) > len(other)
+    def __eq__(self, other):
+        return len(self) == len(other)
+    __le__ = None
+    __ge__ = None
+    __ne__ = None
+s1 = S("FishC")
+s2 = S("fishc")
+# print(s1 <= s2) # 报错
+
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __iter__(self):
+        print("iter", end="->")
+        self.i = 0
+        return self
+    def __next__(self):
+        print("next", end="->")
+        if self.i == len(self.data):
+            raise StopIteration
+        item = self.data[self.i]
+        self.i += 1
+        return item
+    __contains__ = None
+c = C([1, 2, 3, 4, 5])
+# print(3 in c) # 阻止了__contains__后明确不希望检测成员关系，直接报错，不会再继续往后寻找代偿方法
+
+```
+
+
+
+### call 调用对象
+
+```python
+# __call__(self[,args...] 可以像调用函数那样调用对象调用对象
+class C:
+    def __call__(self):
+        print("嗨~")
+c = C()
+c() # 嗨~
+class C:
+    def __call__(self, *args, **kwargs):
+        print(f"位置参数 -> {args}\n关键字参数 -> {kwargs}")
+c = C()
+c(1, 2, 3, x = 250, y = 520)
+
+class Power:
+    def __init__(self, exp):
+        self.exp = exp
+    def __call__(self, base):
+        return base ** self.exp
+square = Power(2)
+print(square(3)) # 9
+
+cube = Power(3)
+print(cube(3)) # 27
+
+
+# ——————————————————————————————————————————————————————
+# __str__(self) 将参数转换为字符串对象
+# __repr__(self) 将对象转换为程序可执行的字符串，可以作为 str() 的代偿
+# eval 将参数去引号后执行
+print(str("FishC")) # FishC
+print(repr("FishC")) # 'FishC'
+print(eval('1 + 2')) # 3
+
+class C:
+    def __repr__(self):
+        return "I Love FishC"
+c = C()
+print(repr(c)) # I Love FishC
+print(str(c)) # I Love FishC
+cs = [C(), C(), C()]
+for each in cs:
+    print(each)
+# I Love FishC
+# I Love FishC
+# I Love FishC
+print(cs) # [I Love FishC, I Love FishC, I Love FishC]
+
+class C:
+    def __str__(self):
+        return "I Love FishC"
+cs = [C(), C(), C()]
+for each in cs:
+    print(each)
+# I Love FishC
+# I Love FishC
+# I Love FishC
+print(cs) # [<__main__.C object at 0x000001F4203F70E0>, <__main__.C object at 0x000001F4205D51D0>, <__main__.C object at 0x000001F4205D5310>]
+class C:
+    def __init__(self, data):
+        self.data = data
+    def __str__(self):
+        return f"data = {self.data}"
+    def __repr__(self):
+        return f"C({self.data})"
+    def __add__(self, other):
+        self.data += other
+c = C(250)
+print(c) # data = 250
+c + 250
+print(c)  # data = 500
+
+```
+
+
+
+### iPhone 提醒事项
+
+```python
+# iPhone 提醒事项
+# 编写一个类，模拟类似 iPhone 的提醒事项功能。
+# 使用文件（如：reminders.pkl）来存储提醒事项
+# 添加提醒事项
+# 查看提醒事项列表
+# 删除提醒事项
+# 标记提醒事项为已完成
+# 搜索提醒事项
+# 按不同属性对提醒事项进行排序
+import pickle
+import time
+from pathlib import Path
+
+
+class Reminder:
+    def __init__(self, storage_file='reminder.pkl'):
+        self.storage_file = Path(storage_file)
+        self.reminders = self.load_reminders()
+
+    def __call__(self, action, *args, **kwargs):
+        actions = {
+            '添加': self.add_reminder,
+            '查看': self.list_reminders,
+            '删除': self.delete_reminder,
+            '完成': self.complete_reminder,
+            '搜索': self.search_reminders,
+        }
+        if action in actions:
+            # 调用对应的函数，并传递 *args 和 **kwargs 作为参数
+            actions[action](*args, **kwargs)
+        else:
+            print("无效操作，请使用'添加'、'查看'、'删除'、'完成'或'搜索'。")
+
+    def __getitem__(self, index):
+        return self.reminders[index]
+
+    def __repr__(self):
+        return f'Reminder(reminders={self.reminders})'
+
+    def __str__(self):
+        return f'提醒事项共有 {len(self.reminders)} 条'
+
+    def load_reminders(self):
+        if self.storage_file.exists():
+            with self.storage_file.open('rb') as f:
+                return pickle.load(f)
+        return []
+
+    def save_reminders(self):
+        with self.storage_file.open('wb') as file:
+            # pickle.dump() 函数用于将 Python 对象序列化为二进制数据，并写入到文件中
+            pickle.dump(self.reminders, file)
+
+    def add_reminder(self, reminder, category, color, priority=0, delay=0):
+        reminder_item = {'text': reminder, 'category': category, 'color': color,
+                         'completed': False, 'priority': priority}
+        self.reminders.append(reminder_item)
+        self.save_reminders()
+        print(f'已添加提醒事项：{reminder}, 分类：{category}, 优先级：{priority}')
+        if delay is not None:
+            time.sleep(delay)
+            self.show_reminders(reminder)
+
+    def show_reminders(self, reminder):
+        print(f'提醒：{reminder}')
+
+    def list_reminders(self):
+        print('提醒事项：')
+        for i, reminder in enumerate(self.reminders):
+            status = '已完成' if reminder['completed'] else '未完成'
+            print(f'{i + 1}. {reminder["text"]} ({reminder["category"]}, {reminder["color"]})'
+                  f' ({status})，优先级：{reminder["priority"]}')
+
+    def delete_reminder(self, index):
+        try:
+            removed = self.reminders.pop(index - 1)
+            self.save_reminders()
+            print(f'已删除提醒事项：{removed["text"]}')
+        except IndexError:
+            print('索引无效，请检查提醒事项列表。')
+
+    def complete_reminder(self, index):
+        try:
+            self.reminders[index - 1]['completed'] = True
+            self.save_reminders()
+            print(f'已完成提醒事项：{self.reminders[index - 1]["text"]}')
+        except IndexError:
+            print('索引无效，请检查提醒事项列表。')
+
+    def search_reminders(self, keyword):
+        results = [r for r in self.reminders if keyword.lower() in r['text'].lower()]
+        if results:
+            print('搜索结果：')
+            for reminder in results:
+                status = '已完成' if reminder['completed'] else '未完成'
+                print(f'{reminder["text"]} ({reminder["category"]}, {reminder["color"]})'
+                      f' ({status})，优先级：{reminder["priority"]}')
+        else:
+            print('未找到与关键词匹配的提醒事项。')
+
+if __name__ == '__main__':
+    # 添加路径
+    p = Path.cwd() / "reminder.pkl"
+
+    # 测试阶段为了防止数据重复添加
+    # 在每次启动时自动删除pickle文件
+    p.unlink(missing_ok=True)
+
+    # 创建对象 __init__
+    reminder = Reminder('reminders.pkl')
+
+    # 添加提醒 __call__
+    print("添加提醒 >>>")
+    reminder('添加', '买牛奶', '购物', '黄色', 1)
+    reminder('添加', '发邮件', '工作', '蓝色', 2)
+    reminder('添加', '学编程', '学编程', '红色', 1)
+    reminder('添加', '打游戏', '娱乐', '紫色', 4)
+    reminder('添加', '谈恋爱', '娱乐', '粉色', 1)
+    reminder('添加', '打酱油', '购物', '黄色', 3)
+
+    # 删除提醒
+    print('\n删除提醒 >>>')
+    reminder.delete_reminder(6)
+
+    # 列举提醒
+    print('\n列举提醒 >>>')
+    reminder.list_reminders()
+
+    # 完成提醒
+    print('\n完成提醒 >>>')
+    reminder.complete_reminder(5)
+
+    # 搜索提醒
+    print('\n搜索提醒 >>>')
+    reminder.search_reminders('编程')
+
+```
+
+
+
+## 16.11 property 类
+
+```python
+# property 类中的方法转换为属性，使得对属性的访问、赋值和删除操作可以通过调用相应的方法来执行
+# class property(fget=None, fset=None, fdel=None, doc=None)
+class C:
+    def __init__(self):
+        self._x = 250
+    def getx(self):
+        return self._x
+    def setx(self, value):
+        self._x = value
+    def delx(self):
+        del self._x
+    # 创建一个属性对象，并将 getx、setx 和 delx 方法分别作为获取、设置和删除属性的操作
+    # x 为 _x 的托管属性
+    x = property(getx, setx, delx)
+
+c = C()
+print(c.x) # 250
+c.x = 520
+print(c.__dict__) # {'_x': 520}
+del c.x
+print(c.__dict__) # {}
+
+class D:
+    def __init__(self):
+        self._x = 250
+    def __getattr__(self, name):
+        if name == "x":
+            return self._x
+        else:
+            super().__getattr__(name)
+    def __setattr__(self, name, value):
+        if name == "x":
+            super().__setattr__('_x', value)
+        else:
+            super().__setattr__(name, value)
+    def __delattr__(self, name):
+        if name == "x":
+            super().__delattr__('_x')
+        else:
+            super().__delattr__(name)
+
+d = D()
+print(d.x) # 250
+d.x = 520
+print(d.__dict__) # {'_x': 520}
+del d.x
+print(d.__dict__) # {}
+
+class E:
+    def __init__(self):
+        self._x = 250
+    # 这里只有获取属性的方法，即只读，无法写入或删除
+    @property
+    def x(self):
+        return self._x
+e = E()
+print(e.x) # 250
+
+class E:
+    def __init__(self):
+        self._x = 250
+    @property # 相当于 x = property(x)
+    def x(self):
+        return self._x
+    @x.setter
+    def x(self, value):
+        self._x = value
+    @x.deleter
+    def x(self):
+        del self._x
+e = E()
+print(e.x) # 250
+e.x = 520
+print(e.__dict__) # {'_x': 520}
+del e.x
+print(e.__dict__) # {}
+
+```
+
+
+
+## 16.12 类方法/静态方法
+
+```python
+# 类方法/静态方法
+# 类方法： 用于绑定类的方法 使用 @classmethod 装饰器来实现
+# 类方法可以帮助统计对象的数量，或通过创建列表来维护一个类对应的所有对象
+# 静态方法： 在类里面定义一个不需要绑定的方法
+class C:
+    # 绑定实例对象
+    def funA(self):
+        print(self)
+    # 绑定类
+    @classmethod
+    def funB(cls):
+        print(cls)
+c = C()
+c.funA() # <__main__.C object at 0x000001B173056F90>
+c.funB() # <class '__main__.C'>
+
+# 统计对象的数量
+class C:
+    count = 0
+    def __init__(self):
+        # 类属性的 count +1
+        C.count += 1
+    @classmethod
+    def get_count(cls):
+        print(f"该类一共实例化了{cls.count}个对象")
+c1 = C()
+c2 = C()
+c3 = C()
+c3.get_count() # 该类一共实例化了3个对象
+
+
+# 实例属性不会覆盖类属性
+c3.count = 1
+print(c3.count) # 1
+c3.get_count() # 该类一共实例化了3个对象
+
+
+# ————————————————————————————————————————————————————
+# 静态方法
+class C:
+    @staticmethod
+    def funC(): # 不需要任何参数进行绑定
+        print("I Love FishC")
+c = C()
+c.funC() # I Love FishC
+C.funC() # I Love FishC
+
+class D:
+    count = 0
+    def __init__(self):
+        # 类属性的 count +1
+        D.count += 1
+    @staticmethod
+    def get_count():
+        print(f"该类一共实例化了{D.count}个对象")
+d1 = D()
+d2 = D()
+d3 = D()
+d3.get_count() # 该类一共实例化了3个对象
+
+
+# ——————————————————————————————————————————————————————————————————
+class C:
+    count = 0
+    # 在涉及继承时可以自动将对应的类传进去
+    @classmethod
+    def add(cls):
+        cls.count += 1
+    def __init__(self):
+        self.add()
+    @classmethod
+    def get_count(cls):
+        print(f"该类一共实例化了{cls.count}个对象")
+
+class D(C):
+    count = 0
+
+class E(C):
+    count = 0
+
+c1 = C()
+d1, d2 = D(), D()
+e1, e2, e3 = E(), E(), E()
+c1.get_count() # 该类一共实例化了1个对象
+d1.get_count() # 该类一共实例化了2个对象
+e1.get_count() # 该类一共实例化了3个对象
+
+
+# ————————————————————————————————————————————————————————————————————
+class C:
+    def funA(self):
+        return self
+
+    @classmethod
+    def funB(cls):
+        return cls
+c = C()
+print(isinstance(c.funA(), c.funB())) # True
+# isinstance() 函数用于判断一个对象是否属于某个类。
+# c.funA() 返回 self 对象，即对象 c；c.funB() 则返回类方法的参数，即类 C
+
+# ————————————————————————————————————————————————————————————————————
+# 类方法和静态方法区别
+class Settings:
+    config = {"theme": "dark", "language": "en"}
+
+    @classmethod
+    def update_config(cls, key, value):
+        cls.config[key] = value
+
+    @staticmethod
+    def reset_config():
+        Settings.config = {}
+
+
+# 更新配置
+Settings.update_config("theme", "light")
+print(Settings.config)
+
+# 重置配置
+Settings.reset_config()
+print(Settings.config)
+# update_config() 定义为类方法，因为它需要访问并修改类属性 config，使用 cls.config 使其在继承时具有多态性。
+# reset_config() 定义为静态方法，因为它不依赖于类或实例的状态，直接操作 Settings.config，无需通过 cls 参数，表示该操作与类的关联较弱，仅仅是对配置进行重置
+
+```
+
+
+
+### 会员订单系统
+
+```python
+# 会员订单系统
+# 根据不同的会员级别和促销活动计算订单的最终价格
+# 创建一个 Discount 类，包含一个类属性 rate，表示折扣率，默认为 0。
+# 实现一个类方法 set_rate(cls, rate)，用于设置折扣率。
+# 实现一个静态方法 calculate(price)，用于根据当前的折扣率计算最终价格。
+# 根据不同的会员级别（如普通会员、黄金会员、白金会员）设置不同的折扣率。
+from itertools import product
+
+
+class Discount:
+    rate = 0
+
+    @classmethod
+    def set_rate(cls, rate):
+        cls.rate = rate
+
+    @staticmethod
+    def calculate(price):
+        return price * (1 - Discount.rate)
+
+
+# 设置普通会员折扣率为 5%
+Discount.set_rate(0.05)
+original_price = 200
+final_price = Discount.calculate(original_price)
+print(f"原价：{original_price} 鱼币，普通会员折后价：{final_price} 鱼币")
+
+# 设置高级会员折扣率为 10%
+Discount.set_rate(0.10)
+original_price = 200
+final_price = Discount.calculate(original_price)
+print(f"原价：{original_price} 鱼币，高级会员折后价：{final_price} 鱼币")
+
+# 设置至尊会员折扣率为 20%
+Discount.set_rate(0.20)
+original_price = 200
+final_price = Discount.calculate(original_price)
+print(f"原价：{original_price} 鱼币，至尊会员折后价：{final_price} 鱼币")
+
+
+# ———————————————————————————————————————————————————————————————————————
+print("——————————————————————————————————————————————————————————————")
+# 升级版
+class Discount:
+    price=0
+    def __init__(self, rate=0):
+        self.rate = rate
+
+    def set_rate(self,rate):
+        self.rate = rate
+
+    @classmethod
+    def set_price(cls, price):
+        cls.price = price
+
+    def calculate(self):
+        return Discount.price * (1 - self.rate)
+
+a = Discount()
+original_price = 200
+a.set_price(original_price)
+a.set_rate(0.05)
+
+b = Discount()
+b.set_rate(0.10)
+
+c = Discount()
+c.set_rate(0.20)
+
+final_price = a.calculate()
+print(f"原价：{original_price} 鱼币，普通会员折后价：{final_price} 鱼币")
+final_price = b.calculate()
+print(f"原价：{original_price} 鱼币，普通会员折后价：{final_price} 鱼币")
+final_price = c.calculate()
+print(f"原价：{original_price} 鱼币，普通会员折后价：{final_price} 鱼币")
+
+
+# ———————————————————————————————————————————————————————————————————————
+print("————————————————————————————————————————————————————————————————")
+# 日志记录器
+# 该类包含一个类属性 log_file，表示日志文件的名称，默认为 app.log。
+# 实现一个类方法 set_log_file(cls, filename)，用于更改日志文件的名称。
+# 实现一个静态方法 log(message)，用于将日志消息写入指定的日志文件。
+# 日志消息需要包含时间戳和日志级别（如 INFO、WARNING、ERROR）。
+import datetime
+class Logger:
+    log_file = "app.log"
+
+    # 更改日志文件的名称
+    @classmethod
+    def set_log_file(cls, filename):
+        cls.log_file = filename
+
+    # 写日志
+    @staticmethod
+    def log(message, level="INFO"):
+        timestamp = datetime.datetime.now().strftime("%Y-%m-%d %H-%M-%S")
+        log_message = f"{timestamp} [{level}]: {message}\n"
+        with open(Logger.log_file, 'a') as f:
+            f.write(log_message)
+
+# 更改名称
+Logger.set_log_file("fishc_app.log")
+
+# 记录不同等级的日志
+Logger.log("应用启动", level="INFO")
+Logger.log("出现异常", level="ERROR")
+Logger.log("用户登入", level="INFO")
+Logger.log("内存空间不足", level="WARNING")
+
+# 查看日志
+with open(Logger.log_file, 'r') as f:
+    content = f.read()
+    print(content)
+
+
+# ———————————————————————————————————————————————————————————————————————
+print("————————————————————————————————————————————————————————————————")
+# 库存管理系统
+# 使用一个类属性 products，为一个列表，存储所有产品的实例。
+# 实现一个类方法 add_product(cls, product)，用于将产品添加到 products 列表中。
+# 实现一个静态方法 is_valid_product(product_info)，用于在添加产品前验证产品信息的有效性。
+# 在产品实例化时，自动将自身添加到 products 列表中，并确保添加前通过验证。
+class Product:
+    # 类属性 products，存储所有产品的实例
+    products = []
+
+    def __init__(self, name, price):
+        self.name = name
+        self.price = price
+        product_info = {'name': self.name, 'price': self.price}
+        # 添加产品
+        if self.is_valid_product(product_info):
+            self.add_product(self)
+            print(f"产品{self.name} 添加成功")
+        else:
+            print(f'无效的产品信息，无法添加产品{self.name}')
+
+    @classmethod
+    def add_product(cls, product):
+        cls.products.append(product)
+
+    # 验证产品
+    @staticmethod
+    def is_valid_product(product_info):
+        if not product_info['name'] or not isinstance(product_info['name'],str):
+            print("产品名称无效")
+            return False
+        if product_info['price'] <= 0:
+            print("产品价格需要为正数")
+            return False
+        return True
+
+# 添加产品信息
+product1 = Product('苹果', 5)
+product2 = Product('香蕉', 3)
+product3 = Product('', 10)
+product4 = Product('橙子', -2)
+
+# 输出所有有效产品信息
+for product in Product.products:
+    print(f'产品名称：{product.name}, 价格：{product.price}')
+
+```
+
+
+
+## 16.13 type()函数
+
+```python
+# type()函数
+# type() 检测类型，返回对应的类型
+# 检测对象类型更适合用 isinstance() 它会考虑到子类的情况
+
+print(type(250)) # <class 'int'>
+print(type(3.14))  # <class 'float'>
+print(type("fishc")) # <class 'str'>
+
+print(int) # <class 'int'>
+print(type(250) is int) # True
+
+# 把 type() 作为类型转换来用
+print(type(250)('520'), int('520')) # 520 520
+
+# 返回对象的类
+class C:
+    def __init__(self, x):
+        self.x = x
+c = C(250)
+print(c) # <__main__.C object at 0x00000163F1AE6F90>
+print(type(c)) # <class '__main__.C'>
+d = type(c)(520)
+print(d) # <__main__.C object at 0x00000159945B4E10>
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+print(type(C), type(type)) # <class 'type'> <class 'type'>
+# python 万物皆对象，而类自身也是对象，是由 type 生成的对象， type 是type的对象
+
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# type(name, base, dict, **kwds) 根据传入的三个参数，返回一个新的 type
+# name:指定将要创造的类的名字
+# bases:指定将要创造的类的父类
+# dict:指定将要创造的类的属性和方法
+# kwds:（可选）收集参数(可以设置多个)，当且仅当需要时，该收集参数将被传递给适当的元类机制（通常为 __init__subclass()：类方法，作用：加强父类对子类的管理）
+
+class C:
+    pass
+# 等价于
+C = type('C', (), {}) # () 元组，此时无指定父类，{} 字典，此时无指定属性方法
+c = C()
+print(c.__class__) # <class '__main__.C'> 查看对象所属的类
+print(C.__bases__) # (<class 'object'>,) 查看类的父类
+
+D = type('D', (C,), {}) # 父类为C，元组，后面加,
+print(D.__bases__) # (<class '__main__.C'>,)
+
+E = type('E', (), dict(x=250, y=520))
+print(E.x, E.y) # 250 520
+
+# 在外部创建函数，在字典中调用
+def funC(self, name='FishC'):
+    print("hello", name)
+F = type('F', (), dict(say_hi=funC))
+f = F()
+f.say_hi() # hello FishC
+
+class C:
+    def __init_subclass__(cls):
+        print("父爱如山")
+        cls.x = 520
+class D(C):
+    x = 250
+# 父爱如山
+print(D.x) # 520
+
+class C:
+    def __init_subclass__(cls, value):
+        print("父爱如山")
+        cls.x = value
+class D(C, value=520):
+    x = 250
+# 父爱如山
+print(D.x) # 520
+# 等价于
+D = type('D', (C, ), dict(x=250), value=520)
+# 父爱如山
+print(D.x) # 520
+
+class C:
+    def __init_subclass__(cls, value1, value2):
+        print("父爱如山")
+        cls.x = value1
+        cls.y = value2
+D = type('D', (C, ), dict(x=250), value1=520, value2=250)
+# 父爱如山
+print(D.x, D.y) # 520 250
+
+```
+
+
+
+## 16.14 元类（metaclass)
+
+```python
+# 元类（metaclass)
+# 元类：创造类的模板，type本身就是元类，且是所有元类的父类，所以它能创造类
+# 元类，这里是类和 type 间的桥梁
+class MetaC(type):
+    pass
+class C(metaclass=MetaC):
+    pass
+c = C()
+print(type(c)) # <class '__main__.C'>
+print(type(C)) # <class '__main__.MetaC'>
+print(type(MetaC)) # <class 'type'>
+
+
+class MetaC(type):
+    def __new__(mcls, name, bases, attrs): # 元类，类名，父类，属性和方法
+        print("__new__() in MetaC")
+        print(f'mcls={mcls}, name={name}, bases={bases}, attrs={attrs}')
+        return type.__new__(mcls, name, bases, attrs)
+    def __init__(cls, name, bases, attrs): # 类
+        print("__init__ in MetaC")
+        print(f'cls={cls}, name={name}, bases={bases}, attrs={attrs}')
+        type.__init__(cls, name, bases, attrs)
+# 创建完成之后调用
+# __new__() in MetaC
+# mcls=<class '__main__.MetaC'>, name=C, bases=(), attrs={'__module__': '__main__', '__qualname__': 'C', '__firstlineno__': 23, '__new__': <function C.__new__ at 0x000002063F2D87C0>, '__init__': <function C.__init__ at 0x000002063F2D8CC0>, '__static_attributes__': (), '__classcell__': <cell at 0x000002063F2E4A90: empty>}
+# __init__ in MetaC
+# cls=<class '__main__.C'>, name=C, bases=(), attrs={'__module__': '__main__', '__qualname__': 'C', '__firstlineno__': 23, '__new__': <function C.__new__ at 0x000002063F2D87C0>, '__init__': <function C.__init__ at 0x000002063F2D8CC0>, '__static_attributes__': (), '__classcell__': <cell at 0x000002063F2E4A90: MetaC object at 0x000002063F3A2DE0>}
+class C(metaclass=MetaC):
+    def __new__(cls):
+        print("__new__() in C")
+        return super().__new__(cls) # object 的 new 所有类的父类
+    def __init__(self):
+        print("__init__ in C")
+c = C()
+# __new__() in C
+# __init__ in C
+
+```
+
+
+
+### 元类的应用
+
+```python
+# 元类的应用
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 1.给所有的类添加 作者 属性
+class MetaC(type):
+    def __new__(mcls, name, bases, attrs):
+        attrs["auther"] = "FishC"
+        return type.__new__(mcls, name, bases, attrs)
+class C(metaclass=MetaC):
+    pass
+class D(metaclass=MetaC):
+    pass
+c = C()
+d = D()
+print(c.auther) # FishC
+print(d.auther) # FishC
+
+class MetaC(type):
+    def __init__(cls, name, bases, attrs):
+        cls.auther = "FishC"
+        type.__init__(cls, name, bases, attrs)
+class C(metaclass=MetaC):
+    pass
+class D(metaclass=MetaC):
+    pass
+c = C()
+d = D()
+print(c.auther) # FishC
+print(d.auther) # FishC
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 2.对类名的定义规范做限制
+# 例如：让类的名字只支持大写字母开头
+class MetaC(type):
+    def __init__(cls, name, bases, attrs):
+        if not name.istitle():
+            raise TypeError("类名必须是大写字母开头")
+        type.__init__(cls, name, bases, attrs)
+# class mycls(metaclass=MetaC):
+#     pass
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 3.修改对象的属性值
+# 例如：让对象的所有属性值大写
+class MetaC(type):
+    # call 允许实例对象像函数一样被调用
+    def __call__(cls, *args, **kwargs):
+        new_args = [each.upper() for each in args if isinstance(each, str)]
+        return type.__call__(cls, *new_args, **kwargs)
+class C(metaclass=MetaC):
+    def __init__(self, name):
+        self.name = name
+c = C('FishC')
+print(c.name) # FISHC
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 4.限制类实例化时的传参方式
+# 例如：让类在对象实例化时仅能传入 关键字参数
+class MetaC(type):
+    def __call__(cls, *args, **kwargs):
+        if args:
+            raise TypeError("仅支持关键字参数")
+        return type.__call__(cls, *args, **kwargs)
+class C(metaclass=MetaC):
+    def __init__(self, name):
+        self.name = name
+# c = C('FishC') 报错
+c = C(name='FishC')
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 5.禁止一个类被实例化
+# 静态方法 类方法 直接通过类访问 是允许的
+class NoInstances(type):
+    # call 实例化时触发
+    def __call__(cls, *args, **kwargs):
+        raise TypeError("该类不允许直接实例化对象")
+class C(metaclass=NoInstances):
+    pass
+# c = C() 报错
+class C(metaclass=NoInstances):
+    @staticmethod
+    def static_ok():
+        print("静态方法直接访问是允许的")
+C.static_ok() # 静态方法直接访问是允许的
+# c = C() 报错
+class C(metaclass=NoInstances):
+    @classmethod
+    def class_ok(cls):
+        print(f"静态方法直接访问是允许的 {cls.__name__}")
+C.class_ok() # 静态方法直接访问是允许的 C
+
+# ———————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 6.只允许实例化一个对象（实例出来的都是同一个对象）
+# instance 指一个类的实例
+class SimpleInstance(type):
+    def __init__(cls, *args, **kwargs):
+        cls.__instance = None
+        type.__init__(cls, *args, **kwargs)
+    def __call__(cls, *args, **kwargs):
+        if cls.__instance is None: # 判断是否存在实例
+            cls.__instance = type.__call__(cls, *args, **kwargs)
+            return cls.__instance
+        else:
+            return cls.__instance
+class C(metaclass=SimpleInstance):
+    pass
+c1 = C()
+c2 = C()
+print(c1 is c2) # True
+print(dir(C))
+# ['_SimpleInstance__instance', '__class__', '__delattr__', '__dict__', '__dir__', '__doc__', '__eq__', '__firstlineno__', '__format__', '__ge__', '__getattribute__', '__getstate__', '__gt__', '__hash__', '__init__', '__init_subclass__', '__le__', '__lt__', '__module__', '__ne__', '__new__', '__reduce__', '__reduce_ex__', '__repr__', '__setattr__', '__sizeof__', '__static_attributes__', '__str__', '__subclasshook__', '__weakref__']
+
+```
+
+
+
+## 16.15 抽象基类
+
+```python
+# 抽象基类
+
+# 元类可以 只允许实例化一个对象（实例出来的都是同一个对象）
+# 符合的如：抽象基类，Mixin（非抽象基类） 为子类提供一些额外功能的实现（不希望被直接实例化）
+
+# 抽象基类：1.不能被直接实例化，只能被继承使用；2.子类必须实现抽象基类中定义的抽象方法
+# 如水果类，这种类就不能直接实现，需要作为抽象类
+# 抽象基类，使用abc模块--AbstractBaseClass, 主要使用 ABCMeta 和 abstractmethod
+# 规范子类，保证子类有相同方法，相同属性，及时检测出问题
+from abc import ABCMeta, abstractmethod
+class Fruit(metaclass=ABCMeta):
+    def __init__(self, name):
+        self.name = name
+    @abstractmethod
+    def good_for_health(self):
+        pass
+class Banana(Fruit):
+    def good_for_health(self):
+        print("只要吃香蕉，人就会变得开心")
+banana = Banana("香蕉")
+banana.good_for_health() # 只要吃香蕉，人就会变得开心
+
+```
+
+
+
+# 17 模块与包
+
+```python
+模块与包# 模块与包
+# —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 模块
+# 每个 python源文件 都可以作为模块来调用，调用这些源文件中的 方法
+
+# 调用方法：
+# import 模块名称 （模块名称.对象名称调用）
+# from 模块名称 import 对象名称 （对象名称调用）
+# import 模块名称 as 对象名称 （模块名称较长时，关联一个名称便于使用）
+
+# 如from ... import *(最好不用*，容易污染命名空间)
+# 当模块方法名相同时，后导入模块将覆盖先导入模块
+
+# 模块在导入时，会从头到尾执行一遍 导入模块 中的所有语句
+# 当脚本被独立执行时，它的 __name__ 属性会被赋值为 __main__ , 作为模块导入时，它的 __name__ 则是该源文件的名称
+# 加入条件语句判断 if __name__ == "__main__": ，当独立执行时，该语句下的内容执行，当作为模块时，该语句不执行
+
+
+# —————————————————————————————————————————————————————————————————————————————————————————————————————————————
+# 包
+# 分类 存放源代码的文件夹， 引用时 包.模块, py3.3版本前，包中需要添加__init__.py 文件
+# 源文件无法调用 包含自己的包 访问 __init__ 中的全局变量， 但可以放在源文件的方法中， 作为模块来调用
+
+# 调用模块还可以在 包中 __init__ import调用需要的模块，这样可以在 import 包时初始化调用所需的模块
+
+
+# from ... import * // import ... as ...
+# from ... import * 特别的，对于包而言，不定义__all__将不导入包内任何内容
+# 可以在源文件或包中添加 __all__ 来限制导入内容
+# 如：源文件中，__all__ = ["say_hello","x"]，即可导入 函数say_hello，属性x
+# 或：__init__.py中，__all__ = ["fc1","fc2"]，即可导入 模块fc1，fc2
+
+```
+
+
+
